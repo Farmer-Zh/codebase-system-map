@@ -1,4 +1,4 @@
-# Living AI System Map：可复用开源模块调研
+# Codebase System Map：可复用开源模块调研
 
 > 调研快照：2026-09-04  
 > 范围：只使用项目官方文档、官方 GitHub 仓库和许可证文件。许可证判断不是法律意见；实际发布前仍应对锁定版本及其传递依赖做一次 SBOM/许可证审查。
@@ -30,7 +30,7 @@
 |---|---|---|---|
 | 运行协议 | OpenTelemetry SDK + [GenAI Semantic Conventions](https://github.com/open-telemetry/semantic-conventions-genai) | OTLP 负责传输，GenAI conventions 负责 inference、embedding、retrieval、tool 等通用属性；独立仓库还提供版本化 schema URL。[GenAI spans](https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/gen-ai-spans.md) | Apache-2.0。GenAI spans 当前仍标为 **Development**，必须锁定 schema URL/版本，并在 Adapter 中做版本迁移，不能直接把属性名当永久领域模型。 |
 | 自动 instrumentation | [OpenTelemetry Python GenAI instrumentations](https://github.com/open-telemetry/opentelemetry-python-genai)；覆盖不足时用 [OpenInference](https://github.com/Arize-ai/openinference) Adapter | 官方 OTel 仓库正在承接 Python GenAI SDK/framework instrumentation；OpenInference 覆盖 OpenAI、Anthropic、LangChain、LlamaIndex、DSPy、MCP 等更多集成，且输出可发往任意 OTel 后端。[OpenInference 支持范围](https://github.com/Arize-ai/openinference#instrumentation) | 均为 Apache-2.0。OpenInference 有自己的语义约定，不能与 OTel `gen_ai.*` 假定为同一 Schema；在 `TraceSource` Adapter 中规范化。 |
-| Trace / Prompt / Eval 后端 | [Langfuse OSS core](https://github.com/langfuse/langfuse) | 能接收 OTLP/HTTP，并提供 tracing、prompt management、datasets、experiments 和 evaluations；Living Map 可通过 Observations API v2 和 Scores API 拉取证据。[OTel 接入](https://langfuse.com/docs/observability/get-started)、[数据 API](https://langfuse.com/docs/api-and-data-platform/overview) | Core 为 MIT，但仓库内 EE 目录另受企业许可；必须遵循根 [LICENSE 的目录边界](https://github.com/langfuse/langfuse/blob/main/LICENSE)。自托管部署并不轻：官方 compose 包含 web、worker、PostgreSQL、ClickHouse、Redis 和 MinIO，[compose 文件](https://github.com/langfuse/langfuse/blob/main/docker-compose.yml)。因此它属于 Phase 2 的可选外部服务，不是 CLI 的硬依赖。 |
+| Trace / Prompt / Eval 后端 | [Langfuse OSS core](https://github.com/langfuse/langfuse) | 能接收 OTLP/HTTP，并提供 tracing、prompt management、datasets、experiments 和 evaluations；Codebase System Map 可通过 Observations API v2 和 Scores API 拉取证据。[OTel 接入](https://langfuse.com/docs/observability/get-started)、[数据 API](https://langfuse.com/docs/api-and-data-platform/overview) | Core 为 MIT，但仓库内 EE 目录另受企业许可；必须遵循根 [LICENSE 的目录边界](https://github.com/langfuse/langfuse/blob/main/LICENSE)。自托管部署并不轻：官方 compose 包含 web、worker、PostgreSQL、ClickHouse、Redis 和 MinIO，[compose 文件](https://github.com/langfuse/langfuse/blob/main/docker-compose.yml)。因此它属于 Phase 2 的可选外部服务，不是 CLI 的硬依赖。 |
 
 最小路径由此变成：
 
@@ -124,15 +124,15 @@ class GraphStore(Protocol):
 
 ### OpenTelemetry 是边界，不是 Langfuse SDK
 
-应用侧应优先发标准 OTel spans。Living Map 自有字段放在独立 namespace，例如：
+应用侧应优先发标准 OTel spans。Codebase System Map 自有字段放在独立 namespace，例如：
 
 ```text
-living_map.flow.id
-living_map.stage.id
-living_map.prompt.id
-living_map.prompt.version
-living_map.artifact.input
-living_map.artifact.output
+codebase_map.flow.id
+codebase_map.stage.id
+codebase_map.prompt.id
+codebase_map.prompt.version
+codebase_map.artifact.input
+codebase_map.artifact.output
 ```
 
 LLM/provider/tool 的标准字段采用锁定版本的 OTel GenAI conventions。原因是官方 conventions 仍处在 Development，且 2026 年已经从通用 semantic-conventions 仓库迁入独立仓库；新的仓库明确提供自己的 schema URL。[迁移说明](https://github.com/open-telemetry/semantic-conventions/releases)、[新仓库 README](https://github.com/open-telemetry/semantic-conventions-genai)。
@@ -155,7 +155,7 @@ interface TraceSource {
 
 Langfuse 适合以下条件同时成立时引入：需要可视化调试真实 Trace、Prompt 版本管理、Dataset/Experiment/Eval，并愿意运维其完整数据栈。其官方资料声明核心 tracing、evaluation、prompt management、experiment、annotation 等能力采用 MIT 许可，而 SCIM、audit log、data retention 等企业模块需要商业许可。[官方开源说明](https://langfuse.com/handbook/chapters/open-source)。
 
-Living Map 应只使用稳定集成面：
+Codebase System Map 应只使用稳定集成面：
 
 - 写入：OTLP/HTTP；Langfuse 官方把 OTel endpoint 作为新 trace ingestion 的支持路径。[Public API](https://langfuse.com/docs/api-and-data-platform/features/public-api)
 - 读取：Observations API v2、Scores API、Experiments API；不要读 Langfuse 的 PostgreSQL/ClickHouse 表。[Observations API v2](https://langfuse.com/docs/api-and-data-platform/features/observations-api)
@@ -269,7 +269,7 @@ DocumentRenderer
 
 ### Iteration 2：Runtime Grounding
 
-1. 定义 `living_map.*` span 属性及内容采集默认关闭策略。
+1. 定义 `codebase_map.*` span 属性及内容采集默认关闭策略。
 2. 选一个官方 OTel GenAI instrumentation 做端到端验证。
 3. 独立部署 Langfuse OSS core，以 OTLP 写入、API 读取；不读取其数据库。
 4. 把 observed stage order、tool call、model、latency、token usage 和 eval score 合入图，同时保留 static-vs-runtime 差异。

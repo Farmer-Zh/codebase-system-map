@@ -1,4 +1,4 @@
-"""Build a diagram-first RepoAtlas document from code and repository evidence."""
+"""Build a diagram-first system map from code and repository evidence."""
 
 from __future__ import annotations
 
@@ -688,7 +688,7 @@ def render_diagrams(system_map: dict[str, Any], node: str, script: Path) -> dict
     diagrams = {"system": system_dot(system_map)}
     for module in system_map["modules"]:
         diagrams[f'module:{module["id"]}'] = module_dot(system_map, module["id"])
-    with tempfile.TemporaryDirectory(prefix="repo-atlas-") as temp_directory:
+    with tempfile.TemporaryDirectory(prefix="codebase-map-") as temp_directory:
         source = Path(temp_directory) / "diagrams.json"
         target = Path(temp_directory) / "rendered.json"
         source.write_text(json.dumps(diagrams, ensure_ascii=False), encoding="utf-8")

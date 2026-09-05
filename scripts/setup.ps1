@@ -28,10 +28,10 @@ if (-not (Test-Path -LiteralPath $virtualPython)) {
 & $virtualPython -m pip install --upgrade pip setuptools
 Assert-NativeCommandSucceeded "Python packaging tool installation"
 & $virtualPython -m pip install --editable $projectRoot --no-build-isolation
-Assert-NativeCommandSucceeded "RepoAtlas installation"
+Assert-NativeCommandSucceeded "Codebase System Map installation"
 
 if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
     throw "Node.js 18+ is required for the bundled SVG renderer."
 }
 
-Write-Host "RepoAtlas installed. Run: .venv\Scripts\repo-atlas.exe <repository>"
+Write-Host "Codebase System Map installed. Run: .venv\Scripts\codebase-map.exe <repository>"

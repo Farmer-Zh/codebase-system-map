@@ -1,8 +1,8 @@
-# RepoAtlas
+# Codebase System Map
 
 > Turn a code repository into a product-readable system map.
 
-RepoAtlas 接收一个本地代码库，输出一份可以直接分享给产品、运营和新成员的独立 HTML 文档。它关注“产品如何运行”，而不是把目录树或完整调用图原样画出来。
+Codebase System Map 接收一个本地代码库，输出一份可以直接分享给产品、运营和新成员的独立 HTML 文档。它关注“产品如何运行”，而不是把目录树或完整调用图原样画出来。
 
 ```text
 Repository
@@ -44,8 +44,8 @@ Repository
 克隆后创建虚拟环境并安装：
 
 ```bash
-git clone https://github.com/Farmer-Zh/RepoAtlas.git
-cd RepoAtlas
+git clone https://github.com/Farmer-Zh/codebase-system-map.git
+cd codebase-system-map
 python -m venv .venv
 ```
 
@@ -86,20 +86,20 @@ MODEL=your-model-name
 最简命令只有代码库路径：
 
 ```bash
-repo-atlas /path/to/repository
+codebase-map /path/to/repository
 ```
 
 Windows 路径示例：
 
 ```powershell
-repo-atlas 'C:\Users\you\Documents\your-project'
+codebase-map 'C:\Users\you\Documents\your-project'
 ```
 
 指定配置、输出位置和语言：
 
 ```bash
-repo-atlas /path/to/repository \
-  --config /path/to/repo-atlas.env \
+codebase-map /path/to/repository \
+  --config /path/to/codebase-map.env \
   --output /path/to/output \
   --language zh
 ```
@@ -112,7 +112,7 @@ repo-atlas /path/to/repository \
 --dry-run           只收集并统计证据，不调用 LLM 或渲染图
 ```
 
-旧的 `living-map` 命令暂时作为兼容入口保留。
+旧的 `repo-atlas` 和 `living-map` 命令暂时作为兼容入口保留。
 
 ## Output
 
@@ -130,12 +130,12 @@ system-map.json   供调试、二次渲染和自动化使用的结构化数据
 
 ```python
 from pathlib import Path
-from repo_atlas import BuildOptions, build_repository
+from codebase_map import BuildOptions, build_repository
 
 result = build_repository(
     "/path/to/repository",
     BuildOptions(
-        config=Path("/path/to/repo-atlas.env"),
+        config=Path("/path/to/codebase-map.env"),
         output_directory=Path("/path/to/output"),
         language="zh",
     ),
@@ -161,7 +161,7 @@ CodeWiki、模型调用、拓扑重建和图形渲染均封装在内部，可以
 - **Diagram Adapter**：让 Viz.js SVG 和 Mermaid 消费同一份 Module View。
 - **Static Exporter**：把图、节点详情和数据内嵌到单个 HTML。
 
-更完整的产品模型见 [repo_atlas.md](repo_atlas.md)。开源组件选型与边界记录在 [docs](docs/) 中。
+更完整的产品模型见 [codebase_system_map.md](codebase_system_map.md)。开源组件选型与边界记录在 [docs](docs/) 中。
 
 ## Development
 
@@ -184,12 +184,12 @@ scripts/living_map/build.py       构建编排与公共接口实现
 scripts/living_map/generator.py   证据、LLM 合成与静态导出
 scripts/living_map/topology.py    Module View Builder 与 Quality Gate
 scripts/living_map/assets/        随包分发的 Viz.js 渲染适配器
-scripts/repo_atlas/               新公共 Python 命名空间
+scripts/codebase_map/             新公共 Python 命名空间
 ```
 
 ## Open-source components
 
-RepoAtlas 主要组合以下开源模块：
+Codebase System Map 主要组合以下开源模块：
 
 - [CodeWiki](https://github.com/PorunC/CodeWiki) — 代码结构和关系事实。
 - [NetworkX](https://networkx.org/) — 模块拓扑推导。

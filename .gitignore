@@ -3,6 +3,7 @@
 node_modules/
 .codewiki/
 .repo-atlas/
+.codebase-map/
 data/
 storage/
 generated/

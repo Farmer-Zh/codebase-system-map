@@ -9,9 +9,9 @@ param(
 
 $ErrorActionPreference = "Stop"
 $projectRoot = Split-Path -Parent $PSScriptRoot
-$cli = Join-Path $projectRoot ".venv\Scripts\repo-atlas.exe"
+$cli = Join-Path $projectRoot ".venv\Scripts\codebase-map.exe"
 if (-not (Test-Path -LiteralPath $cli -PathType Leaf)) {
-    throw "RepoAtlas is not installed. Run .\scripts\setup.ps1 first."
+    throw "Codebase System Map is not installed. Run .\scripts\setup.ps1 first."
 }
 
 $arguments = @(
@@ -30,5 +30,5 @@ if ($ForceAnalysis) {
 
 & $cli @arguments
 if ($LASTEXITCODE -ne 0) {
-    throw "RepoAtlas build failed with exit code $LASTEXITCODE."
+    throw "Codebase System Map build failed with exit code $LASTEXITCODE."
 }

@@ -1,4 +1,4 @@
-"""Compatibility command for the former RepoAtlas name."""
+"""Codebase System Map command-line entry point."""
 
 from living_map.cli import main, parser
 

@@ -3,7 +3,7 @@ requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "repo-atlas"
+name = "codebase-system-map"
 version = "0.1.0"
 description = "Turn a code repository into a product-readable system map"
 readme = "README.md"
@@ -19,17 +19,18 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Farmer-Zh/RepoAtlas"
-Repository = "https://github.com/Farmer-Zh/RepoAtlas.git"
-Issues = "https://github.com/Farmer-Zh/RepoAtlas/issues"
+Homepage = "https://github.com/Farmer-Zh/codebase-system-map"
+Repository = "https://github.com/Farmer-Zh/codebase-system-map.git"
+Issues = "https://github.com/Farmer-Zh/codebase-system-map/issues"
 
 [project.scripts]
+codebase-map = "codebase_map.cli:main"
 repo-atlas = "repo_atlas.cli:main"
 living-map = "living_map.cli:main"
 
 [tool.setuptools]
 package-dir = {"" = "scripts"}
-packages = ["living_map", "repo_atlas"]
+packages = ["living_map", "repo_atlas", "codebase_map"]
 
 [tool.setuptools.package-data]
 living_map = ["assets/*"]

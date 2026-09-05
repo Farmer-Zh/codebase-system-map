@@ -1,15 +1,15 @@
-# Living AI System Map：以完整开源产品为基座的方案
+# Codebase System Map：以完整开源产品为基座的方案
 
 > 调研快照：2026-09-04  
 > 范围：仅引用候选项目的官方 GitHub、官方文档和许可证。许可证判断不是法律意见；落地前仍应锁定具体版本并做依赖许可证审查。
 
 ## 结论先行
 
-可以，而且应该进一步减少自研。此前“若干底层库 + 自有 Compiler + 自有 Document Compiler + 自有 Renderer”的路线，虽然模块化，却仍然等于自行建设一个代码知识平台。现在已有更高层项目覆盖了仓库摄取、AST、关系图、GraphRAG、LLM Wiki、增量更新和文档导出，Living Map 不必再拥有这些通用能力。
+可以，而且应该进一步减少自研。此前“若干底层库 + 自有 Compiler + 自有 Document Compiler + 自有 Renderer”的路线，虽然模块化，却仍然等于自行建设一个代码知识平台。现在已有更高层项目覆盖了仓库摄取、AST、关系图、GraphRAG、LLM Wiki、增量更新和文档导出，Codebase System Map 不必再拥有这些通用能力。
 
 最合理的新定位是：
 
-> **Living Map 不再是独立平台，而是现有 Code Wiki 产品上的 AI-system domain pack。**
+> **Codebase System Map 不再是独立平台，而是现有 Code Wiki 产品上的 AI-system domain pack。**
 
 推荐顺序：
 
@@ -37,7 +37,7 @@
 
 表中 CodeWiki 的能力依据其官方 README 和设计文档：它支持 Python、TypeScript/JavaScript、Java、Go、Rust、C/C++、C#，建立 deterministic imports/definitions/calls/routes/inheritance/config edges，并生成带源码引用、图表、翻译和增量更新的 Wiki。[README](https://github.com/PorunC/CodeWiki#highlights) [Usage Guide](https://github.com/PorunC/CodeWiki/blob/main/docs/usage.md#current-scope)
 
-## 方案 A：PorunC/CodeWiki + Living Map AI domain pack（默认推荐）
+## 方案 A：PorunC/CodeWiki + Codebase System Map AI domain pack（默认推荐）
 
 ### 为什么它最贴近目标
 
@@ -58,13 +58,13 @@ CodeWiki 自己的产品定义已经几乎等于本项目的通用部分：本�
 
 这些均可在官方 [Design Notes](https://github.com/PorunC/CodeWiki/blob/main/docs/design.md) 与 [Usage Guide](https://github.com/PorunC/CodeWiki/blob/main/docs/usage.md) 中核对。尤其重要的是，独立 HTML 已是现成功能，不需要再引入 Vite single-file 插件或自建 Renderer；导出在浏览器内从已加载 Wiki 数据完成，不依赖后台 export API。[Wiki Export](https://github.com/PorunC/CodeWiki/blob/main/docs/usage.md#wiki-export)
 
-### Living Map 只保留什么
+### Codebase System Map 只保留什么
 
-建议不再创建新的 artifact pipeline、plugin protocol、graph store 或 document renderer，只维护一个小型 `living-map-ai-pack`：
+建议不再创建新的 artifact pipeline、plugin protocol、graph store 或 document renderer，只维护一个小型 `codebase-map-ai-pack`：
 
 1. **AI framework recognizers**：在 CodeWiki 的 `capture_specs` / `augmenters` 扩展点上识别 Prompt、LLM Call、Tool、Retriever、Agent、Graph Node。官方 AST 层本来就以通用 `AstSymbol.metadata` 承载增强信息，并将语言增强器与 capture query 分开。[AST Parser 设计](https://github.com/PorunC/CodeWiki/blob/main/docs/design.md#53-ast-parser)
 2. **AI semantic tags，而非新图内核**：MVP 先把 `ai_kind=prompt|tool|model_call|artifact`、framework、model expression、source range 放入现有节点 metadata；Flow/Stage 作为从 endpoint/entry point 到 model/tool call 的命名路径或 Wiki 页面元数据。只有 UI 确实需要独立筛选时，才把这些提升为一级 node types。
-3. **Living Map Wiki profile**：替换/补充 catalog 和 page prompt，固定生成 `System Overview`、`Flows`、`Stages`、`Prompts & Tools`、`Artifacts`、`Impact` 页面。CodeWiki 已把 catalog、page、validator、diagram、source rendering 分成清晰子模块，无需另建 Document Compiler。[Wiki 子系统设计](https://github.com/PorunC/CodeWiki/blob/main/docs/design.md#9-wiki-%E7%94%9F%E6%88%90%E8%AE%BE%E8%AE%A1)
+3. **Codebase System Map Wiki profile**：替换/补充 catalog 和 page prompt，固定生成 `System Overview`、`Flows`、`Stages`、`Prompts & Tools`、`Artifacts`、`Impact` 页面。CodeWiki 已把 catalog、page、validator、diagram、source rendering 分成清晰子模块，无需另建 Document Compiler。[Wiki 子系统设计](https://github.com/PorunC/CodeWiki/blob/main/docs/design.md#9-wiki-%E7%94%9F%E6%88%90%E8%AE%BE%E8%AE%A1)
 4. **少量 UI 词汇和过滤器**：给上述 metadata 增加颜色、图例、过滤条件和详情字段；继续复用现有图浏览、Wiki、search、impact 和 standalone HTML export。
 5. **可选兼容导出**：若外部集成确实需要 `system-map.json`，由 CodeWiki graph/query API 生成一个只读 export；它不再是内部唯一真相。
 
@@ -98,11 +98,11 @@ Repowise 已是更成熟、更宽的“代码库知识产品”：它索引代�
 - post-commit hooks、watcher、webhooks/polling 增量维护；
 - Markdown、HTML、JSON 和 Structurizr DSL 导出。HTML 当前是一页一文件，不是 single-file HTML。[CLI export](https://github.com/repowise-dev/repowise/blob/main/packages/cli/README.md#repowise-export)
 
-Living Map 只需新增 AI framework dynamic hints、Prompt/Tool/Artifact 标注、AI 专用 Wiki 模板，并可选增加单文件打包。若接受 Repowise 的页面结构和多文件 HTML，剩余开发约 **10%–20%**，可能比方案 A 更少。
+Codebase System Map 只需新增 AI framework dynamic hints、Prompt/Tool/Artifact 标注、AI 专用 Wiki 模板，并可选增加单文件打包。若接受 Repowise 的页面结构和多文件 HTML，剩余开发约 **10%–20%**，可能比方案 A 更少。
 
 但许可证是决定性边界：仓库根部标示 AGPL-3.0；官方说明内部使用开放版可行，但把 Repowise 嵌入自有产品且不愿承担 AGPL 义务时需要商业许可。[根仓库许可标识](https://github.com/repowise-dev/repowise) [Commercial Offering](https://github.com/repowise-dev/repowise/blob/main/docs/business/COMMERCIAL.md#7-licensing--pricing) 因此：
 
-- Living Map 若明确保持 AGPL 开源，可直接 fork；
+- Codebase System Map 若明确保持 AGPL 开源，可直接 fork；
 - 若计划闭源、SaaS 或商业再分发，应先谈商业授权，再把它定为技术基座；
 - 不要因为 `packages/cli` README 曾显示 Apache-2.0 就忽略根仓库当前的 AGPL 条款，锁定版本后应逐包审查。
 
@@ -131,7 +131,7 @@ GitNexus 在结构理解方面离 AI System Map 很近。官方管线会抽取�
 
 DeepWiki-Open 已有完整 Wiki UX、RAG、Ask/Deep Research、多模型和 Mermaid，并支持 GitHub/GitLab/Bitbucket 及私库。[官方 README](https://github.com/AsyncFuncAI/deepwiki-open/blob/main/README.zh.md) 它也有 `/export/wiki` 的 Markdown/JSON 导出。[API 文档](https://github.com/AsyncFuncAI/deepwiki-open/blob/main/README.zh-tw.md#-api-%E7%AB%AF%E9%BB%9E)
 
-但其核心知识层是 repository files + embeddings/RAG，由 LLM 生成结构和图，不是可查询、带 provenance/confidence 的确定性代码关系图。要达到 Living Map 的可信 Flow/Stage/Impact，仍要另接代码图并重做数据融合，结果又回到上一版的大量 Adapter/Compiler 工作。因此它适合“快速得到漂亮 Wiki”，不适合本项目强调的可追溯系统地图。
+但其核心知识层是 repository files + embeddings/RAG，由 LLM 生成结构和图，不是可查询、带 provenance/confidence 的确定性代码关系图。要达到 Codebase System Map 的可信 Flow/Stage/Impact，仍要另接代码图并重做数据融合，结果又回到上一版的大量 Adapter/Compiler 工作。因此它适合“快速得到漂亮 Wiki”，不适合本项目强调的可追溯系统地图。
 
 ### RepoAgent
 
@@ -143,7 +143,7 @@ Potpie 已把 repo、source history、decisions 和 engineering workflow 组织�
 
 ### GitDiagram
 
-GitDiagram 的输入事实只有 GitHub 默认分支的 recursive tree 和 README，随后由两个模型阶段生成 explanation 和 graph AST；输出是 Mermaid source 或 PNG。[官方生成流程](https://github.com/ahmedkhaleel2004/gitdiagram#how-generation-works) 它很适合快速架构草图，但不读取完整代码来构建调用/数据关系，也没有增量文档生命周期，不能承担 Living Map 的事实层。
+GitDiagram 的输入事实只有 GitHub 默认分支的 recursive tree 和 README，随后由两个模型阶段生成 explanation 和 graph AST；输出是 Mermaid source 或 PNG。[官方生成流程](https://github.com/ahmedkhaleel2004/gitdiagram#how-generation-works) 它很适合快速架构草图，但不读取完整代码来构建调用/数据关系，也没有增量文档生命周期，不能承担 Codebase System Map 的事实层。
 
 ### Aider repo map
 
@@ -178,11 +178,11 @@ Sphinx/MkDocs Material 是成熟发布层；Material 能把 Markdown 构建成�
 
 ```text
 PorunC/CodeWiki upstream
-  + living-map-ai recognizers
+  + codebase-map-ai recognizers
       Prompt / Model Call / Tool / Retriever / Agent / Artifact candidates
-  + living-map flow derivation
+  + codebase-map flow derivation
       Entry point -> ordered code path -> named Flow/Stage
-  + living-map wiki profile
+  + codebase-map wiki profile
       固定面向人类的页面结构与置信度措辞
   + small UI registry
       AI 类型图例、筛选和详情字段
@@ -208,7 +208,7 @@ PorunC/CodeWiki upstream
 ```text
 PorunC/CodeWiki (MIT, upstream product)
         +
-Living Map AI domain pack (our differentiator)
+Codebase System Map AI domain pack (our differentiator)
         =
 Repository -> source-grounded AI system wiki -> standalone HTML
 ```

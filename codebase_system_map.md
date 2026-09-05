@@ -1,4 +1,4 @@
-# RepoAtlas：团队共享的系统行为与实现地图
+# Codebase System Map：团队共享的系统行为与实现地图
 
 ## 1. 目标
 
@@ -709,7 +709,7 @@ repo。
 
 最终产品可以定义为：
 
-# RepoAtlas
+# Codebase System Map
 
 ``` text
                      AI System
@@ -775,4 +775,4 @@ Git CI/CD
 > 才是团队长期拥有的系统语义资产。**
 
 这样最终得到的不是一次性架构文档，而是一份能够随着代码、Prompt
-和实际运行方式持续演进的 **RepoAtlas**。
+和实际运行方式持续演进的 **Codebase System Map**。

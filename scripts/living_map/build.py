@@ -1,4 +1,4 @@
-"""Public build interface for the installable RepoAtlas package."""
+"""Public build interface for the installable Codebase System Map package."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from .generator import generate_repository_map
 class BuildOptions:
     output_directory: Path | None = None
     config: Path = Path(".env")
-    work_directory: Path = Path(".repo-atlas")
+    work_directory: Path = Path(".codebase-map")
     language: str = "zh"
     force_analysis: bool = False
     dry_run: bool = False

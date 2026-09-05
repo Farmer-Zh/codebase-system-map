@@ -1,4 +1,4 @@
-"""Compatibility package for the former RepoAtlas name."""
+"""Public Codebase System Map package interface."""
 
 from __future__ import annotations
 
