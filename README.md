@@ -53,6 +53,20 @@ Windows PowerShell：
 ```powershell
 .\.venv\Scripts\Activate.ps1
 python -m pip install .
+codebase-map --version
+```
+
+激活虚拟环境后，可以在当前 PowerShell 中直接使用 `codebase-map`。不想激活时，
+使用虚拟环境中的完整入口：
+
+```powershell
+.\.venv\Scripts\codebase-map.exe 'C:\path\to\repository'
+```
+
+如果 `git pull` 后项目的包目录发生过变化，需要在现有虚拟环境中重新安装：
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install . --no-deps --force-reinstall
 ```
 
 macOS/Linux：
