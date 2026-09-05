@@ -13,6 +13,32 @@ from .models import ApiConfig, EvidenceBundle, SystemMap
 from .topology import enrich_system_map
 
 
+def resolve_output_language(
+    requested: str,
+    documents: list[dict[str, Any]],
+) -> str:
+    """Resolve an explicit language or infer Chinese/English from project documents."""
+    normalized = requested.strip().lower()
+    aliases = {
+        "chinese": "zh",
+        "中文": "zh",
+        "zh-cn": "zh",
+        "english": "en",
+        "英文": "en",
+        "en-us": "en",
+        "en-gb": "en",
+    }
+    if normalized and normalized != "auto":
+        return aliases.get(normalized, normalized)
+
+    text = "\n".join(str(document.get("content") or "") for document in documents)
+    han_characters = len(re.findall(r"[\u3400-\u9fff]", text))
+    latin_characters = len(re.findall(r"[A-Za-z]", text))
+    if han_characters >= 20 and han_characters >= latin_characters * 0.2:
+        return "zh"
+    return "en"
+
+
 def read_api_config(path: Path) -> tuple[str, str, str]:
     from dotenv import dotenv_values
 
@@ -140,7 +166,11 @@ def safe_id(value: str, fallback: str) -> str:
     return normalized or fallback
 
 
-def normalize_map(raw: dict[str, Any], prompt_assets: list[dict[str, Any]]) -> dict[str, Any]:
+def normalize_map(
+    raw: dict[str, Any],
+    prompt_assets: list[dict[str, Any]],
+    language: str = "en",
+) -> dict[str, Any]:
     raw_modules = list(raw.get("modules") or [])
     raw_nodes = list(raw.get("nodes") or [])
     raw_edges = list(raw.get("edges") or [])
@@ -217,6 +247,7 @@ def normalize_map(raw: dict[str, Any], prompt_assets: list[dict[str, Any]]) -> d
         "system": {
             "name": str(system.get("name") or "AI System"),
             "summary": str(system.get("summary") or "")[:800],
+            "language": language,
         },
         "modules": modules,
         "nodes": nodes,
@@ -244,22 +275,23 @@ def load_api_config(path: Path) -> ApiConfig:
 def compile_system_map(
     evidence: EvidenceBundle,
     config: ApiConfig,
-    language: str = "zh",
+    language: str = "auto",
     *,
     synthesizer: Synthesizer = synthesize_map,
 ) -> SystemMap:
     """Synthesize, normalize, and structurally validate one system map."""
+    resolved_language = resolve_output_language(language, list(evidence.documents))
     raw = synthesizer(
         url=config.url,
         key=config.key,
         model=config.model,
         repository_name=evidence.repository_name,
-        language=language,
+        language=resolved_language,
         facts=evidence.facts,
         documents=list(evidence.documents),
         prompt_assets=list(evidence.prompt_assets),
     )
-    return normalize_map(raw, list(evidence.prompt_assets))
+    return normalize_map(raw, list(evidence.prompt_assets), resolved_language)
 
 
-__all__ = ["compile_system_map", "load_api_config"]
+__all__ = ["compile_system_map", "load_api_config", "resolve_output_language"]

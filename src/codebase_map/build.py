@@ -11,7 +11,12 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from .compiler import compile_system_map, load_api_config, synthesis_messages
+from .compiler import (
+    compile_system_map,
+    load_api_config,
+    resolve_output_language,
+    synthesis_messages,
+)
 from .document import export_system_map
 from .evidence import collect_evidence
 from .models import SystemMap
@@ -22,7 +27,7 @@ class BuildOptions:
     output_directory: Path | None = None
     config: Path = Path(".env")
     work_directory: Path = Path(".codebase-map")
-    language: str = "zh"
+    language: str = "auto"
     force_analysis: bool = False
     dry_run: bool = False
     debug_artifacts: bool = False
@@ -81,16 +86,19 @@ def _generate_system_map(
     debug_artifacts: bool,
 ) -> SystemMap | None:
     evidence = collect_evidence(repository, database, repo_id)
+    resolved_language = resolve_output_language(language, list(evidence.documents))
     print(
         f"Evidence: {len(evidence.documents)} architecture documents, "
         f"{len(evidence.prompt_assets)} prompt assets, "
         f"{len(evidence.facts['module_candidates'])} code modules",
         flush=True,
     )
+    language_source = "detected from project documents" if language == "auto" else "explicit"
+    print(f"Output language: {resolved_language} ({language_source})", flush=True)
     request_chars = len(
         synthesis_messages(
             evidence.repository_name,
-            language,
+            resolved_language,
             evidence.facts,
             list(evidence.documents),
             list(evidence.prompt_assets),
@@ -107,7 +115,11 @@ def _generate_system_map(
     if dry_run:
         return None
 
-    system_map = compile_system_map(evidence, load_api_config(config), language)
+    system_map = compile_system_map(
+        evidence,
+        load_api_config(config),
+        resolved_language,
+    )
     export_system_map(
         system_map,
         output_directory,

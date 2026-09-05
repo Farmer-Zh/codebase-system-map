@@ -13,6 +13,75 @@ from .models import ArtifactSet, SystemMap
 from .topology import module_edge_details, module_view_for
 
 
+def document_copy(system_map: dict[str, Any]) -> dict[str, Any]:
+    language = str(system_map.get("system", {}).get("language") or "en").lower()
+    if language.startswith("zh"):
+        return {
+            "html_language": "zh-CN",
+            "map_label": "代码库系统图",
+            "system_flow": "系统流程",
+            "system_overview": "系统总览",
+            "overall_architecture": "整体架构",
+            "overview_help": "实线表示主调用路径；虚线表示读取、写入、返回或慢任务关系。点击模块可下钻。",
+            "module": "模块",
+            "diagram_key": "虚线节点表示该模块的外部接口",
+            "drawing": "正在绘制...",
+            "diagram_error": "图形渲染失败：",
+            "from_external": "来自 {name}\n任务 / 数据输入",
+            "to_external": "送往 {name}\n结果 / 状态回写",
+            "from_short": "来自 {name} · 输入",
+            "to_short": "送往 {name} · 回写",
+            "input": "输入",
+            "output": "输出",
+            "implementation": "实现位置",
+            "actual_prompt": "实际 Prompt",
+            "source_prompt": "源码 Prompt",
+            "documented_prompt": "文档 Prompt",
+            "excerpt": "（节选）",
+            "no_prompt": "此节点不直接调用 LLM，或未发现 Prompt 证据。",
+            "branch_suffix": " · {count} 个分支",
+            "topologies": {
+                "single": "单节点",
+                "pipeline": "流水线",
+                "parallel": "并行分支",
+                "branched": "分支流程",
+                "network": "循环网络",
+            },
+        }
+    return {
+        "html_language": "en",
+        "map_label": "CODEBASE SYSTEM MAP",
+        "system_flow": "SYSTEM FLOW",
+        "system_overview": "System overview",
+        "overall_architecture": "Overall architecture",
+        "overview_help": "Solid lines show the primary runtime path. Dashed lines show reads, writes, returns, or background work. Select a module to drill down.",
+        "module": "MODULE",
+        "diagram_key": "Dashed nodes represent interfaces outside this module",
+        "drawing": "Drawing...",
+        "diagram_error": "Diagram rendering failed: ",
+        "from_external": "From {name}\nTask / data input",
+        "to_external": "To {name}\nResult / state writeback",
+        "from_short": "From {name} · input",
+        "to_short": "To {name} · writeback",
+        "input": "Input",
+        "output": "Output",
+        "implementation": "Implementation",
+        "actual_prompt": "Actual prompt",
+        "source_prompt": "Source prompt",
+        "documented_prompt": "Documented prompt",
+        "excerpt": " (excerpt)",
+        "no_prompt": "This node does not call an LLM directly, or no prompt evidence was found.",
+        "branch_suffix": " · {count} branches",
+        "topologies": {
+            "single": "Single node",
+            "pipeline": "Pipeline",
+            "parallel": "Parallel branches",
+            "branched": "Branched flow",
+            "network": "Cyclic network",
+        },
+    }
+
+
 def dot_escape(value: str) -> str:
     return value.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
 
@@ -46,6 +115,7 @@ def system_dot(system_map: dict[str, Any]) -> str:
 
 
 def module_dot(system_map: dict[str, Any], module_id: str) -> str:
+    copy = document_copy(system_map)
     nodes = [node for node in system_map["nodes"] if node["module_id"] == module_id]
     ids = {node["id"] for node in nodes}
     all_nodes = {node["id"]: node for node in system_map["nodes"]}
@@ -74,13 +144,13 @@ def module_dot(system_map: dict[str, Any], module_id: str) -> str:
     ]
     for node_id in incoming_sources:
         external = all_nodes.get(node_id, {"name": node_id})
-        label = f'来自 {external["name"]}\n任务 / 数据输入'
+        label = copy["from_external"].format(name=external["name"])
         lines.append(
             f'"ext-in-{dot_escape(node_id)}" [label="{dot_escape(label)}", shape=box, style="rounded,dashed,filled", fillcolor="#eef2f6", color="#98a2b3", URL="#node-{dot_escape(node_id)}", target="_top"];'
         )
     for node_id in outgoing_targets:
         external = all_nodes.get(node_id, {"name": node_id})
-        label = f'送往 {external["name"]}\n结果 / 状态回写'
+        label = copy["to_external"].format(name=external["name"])
         lines.append(
             f'"ext-out-{dot_escape(node_id)}" [label="{dot_escape(label)}", shape=box, style="rounded,dashed,filled", fillcolor="#eef2f6", color="#98a2b3", URL="#node-{dot_escape(node_id)}", target="_top"];'
         )
@@ -124,12 +194,13 @@ def mermaid_label(value: str) -> str:
 
 
 def markdown_output(system_map: dict[str, Any]) -> str:
+    copy = document_copy(system_map)
     lines = [
         f'# {system_map["system"]["name"]}',
         "",
         system_map["system"]["summary"],
         "",
-        "## 系统总览",
+        f'## {copy["system_overview"]}',
         "",
         "```mermaid",
         "flowchart LR",
@@ -153,12 +224,14 @@ def markdown_output(system_map: dict[str, Any]) -> str:
         lines.extend([f'## {module["name"]}', "", module["responsibility"], "", "```mermaid", f"flowchart {direction}"])
         for node_id in (group["external_node_id"] for group in incoming_groups):
             name = all_nodes.get(node_id, {"name": node_id})["name"]
-            lines.append(f'  ext_in_{mermaid_id(node_id)}[["来自 {mermaid_label(name)} · 输入"]]')
+            label = copy["from_short"].format(name=mermaid_label(name))
+            lines.append(f'  ext_in_{mermaid_id(node_id)}[["{label}"]]')
         for node in nodes:
             lines.append(f'  {mermaid_id(node["id"])}["{mermaid_label(node["name"])}"]')
         for node_id in (group["external_node_id"] for group in outgoing_groups):
             name = all_nodes.get(node_id, {"name": node_id})["name"]
-            lines.append(f'  ext_out_{mermaid_id(node_id)}[["送往 {mermaid_label(name)} · 回写"]]')
+            label = copy["to_short"].format(name=mermaid_label(name))
+            lines.append(f'  ext_out_{mermaid_id(node_id)}[["{label}"]]')
         for edge in view["internal_edges"]:
             label = mermaid_label(edge["label"] or edge["type"]).replace("|", "/")
             lines.append(f'  {mermaid_id(edge["from"])} -->|"{label}"| {mermaid_id(edge["to"])}')
@@ -176,21 +249,21 @@ def markdown_output(system_map: dict[str, Any]) -> str:
                     "",
                     node["purpose"],
                     "",
-                    f'- 输入：{", ".join(node["inputs"]) or "—"}',
-                    f'- 输出：{", ".join(node["outputs"]) or "—"}',
-                    f'- 实现：{", ".join(f"`{path}`" for path in node["implementation"]) or "—"}',
+                    f'- {copy["input"]}: {", ".join(node["inputs"]) or "—"}',
+                    f'- {copy["output"]}: {", ".join(node["outputs"]) or "—"}',
+                    f'- {copy["implementation"]}: {", ".join(f"`{path}`" for path in node["implementation"]) or "—"}',
                     "",
                 ]
             )
             if not node["prompts"]:
-                lines.extend(["Prompt：此节点不直接调用 LLM，或未发现 Prompt 证据。", ""])
+                lines.extend([f'Prompt: {copy["no_prompt"]}', ""])
             for prompt in node["prompts"]:
-                prompt_label = "源码 Prompt" if prompt["evidence_kind"] == "source_prompt" else "文档 Prompt"
+                prompt_label = copy["source_prompt"] if prompt["evidence_kind"] == "source_prompt" else copy["documented_prompt"]
                 if prompt.get("truncated"):
-                    prompt_label += "（节选）"
+                    prompt_label += copy["excerpt"]
                 lines.extend(
                     [
-                        f'{prompt_label}：`{prompt["source_path"]}:{prompt["start_line"]}`',
+                        f'{prompt_label}: `{prompt["source_path"]}:{prompt["start_line"]}`',
                         "",
                         "```text",
                         prompt["content"],
@@ -212,50 +285,45 @@ def html_output(
     diagrams: dict[str, str],
     viz_module_base64: str,
 ) -> str:
+    copy = document_copy(system_map)
     modules_html: list[str] = []
-    topology_names = {
-        "single": "单节点",
-        "pipeline": "流水线",
-        "parallel": "并行分支",
-        "branched": "分支流程",
-        "network": "循环网络",
-    }
+    topology_names = copy["topologies"]
     for module in system_map["modules"]:
         nodes = [node for node in system_map["nodes"] if node["module_id"] == module["id"]]
         view = module_view_for(system_map, module["id"])
         metrics = view["metrics"]
         topology_text = topology_names.get(view["topology"], view["topology"])
         if metrics["branch_count"] > 1:
-            topology_text += f' · {metrics["branch_count"]} 个分支'
+            topology_text += copy["branch_suffix"].format(count=metrics["branch_count"])
         node_cards: list[str] = []
         for node in nodes:
             prompt_html = ""
             if node["prompts"]:
                 prompt_blocks = []
                 for prompt in node["prompts"]:
-                    prompt_title = "源码 Prompt" if prompt["evidence_kind"] == "source_prompt" else "文档 Prompt"
+                    prompt_title = copy["source_prompt"] if prompt["evidence_kind"] == "source_prompt" else copy["documented_prompt"]
                     if prompt.get("truncated"):
-                        prompt_title += "（节选）"
+                        prompt_title += copy["excerpt"]
                     prompt_blocks.append(
                         f'<h6>{prompt_title}</h6>'
                         f'<div class="prompt-source">{html.escape(prompt["source_path"])}:{prompt["start_line"]}-{prompt["end_line"]}</div>'
                         f'<pre>{html.escape(prompt["content"])}</pre>'
                     )
-                prompt_html = '<div class="prompt"><h5>实际 Prompt</h5>' + "".join(prompt_blocks) + "</div>"
+                prompt_html = f'<div class="prompt"><h5>{copy["actual_prompt"]}</h5>' + "".join(prompt_blocks) + "</div>"
             else:
-                prompt_html = '<div class="no-prompt">不直接调用 LLM，或未发现 Prompt 证据</div>'
+                prompt_html = f'<div class="no-prompt">{copy["no_prompt"]}</div>'
             node_cards.append(
                 f'''<details class="node-card" id="node-{html.escape(node["id"])}" data-search="{html.escape((node["name"] + ' ' + node["purpose"] + ' ' + ' '.join(node["implementation"])).lower())}">
 <summary><span class="kind {html.escape(node["kind"])}">{html.escape(node["kind"])}</span><strong>{html.escape(node["name"])}</strong><span class="summary-purpose">{html.escape(node["purpose"])}</span></summary>
-<div class="node-body"><div class="io"><div><h5>输入</h5>{chips(node["inputs"])}</div><div><h5>输出</h5>{chips(node["outputs"])}</div></div>
-<div class="implementation"><h5>实现位置</h5>{chips(node["implementation"])}</div>{prompt_html}</div>
+<div class="node-body"><div class="io"><div><h5>{copy["input"]}</h5>{chips(node["inputs"])}</div><div><h5>{copy["output"]}</h5>{chips(node["outputs"])}</div></div>
+<div class="implementation"><h5>{copy["implementation"]}</h5>{chips(node["implementation"])}</div>{prompt_html}</div>
 </details>'''
             )
         modules_html.append(
             f'''<section class="module" id="module-{html.escape(module["id"])}">
-<div class="module-heading"><div><span class="eyebrow">MODULE</span><span class="topology">{html.escape(topology_text)}</span><h2>{html.escape(module["name"])}</h2><p>{html.escape(module["responsibility"])}</p></div><div class="module-paths">{chips(module["source_paths"])}</div></div>
-<div class="diagram-key"><span></span>虚线节点表示该模块的外部接口</div>
-<div class="diagram module-diagram" data-diagram="module:{html.escape(module['id'])}"><span class="empty">正在绘制...</span></div>
+<div class="module-heading"><div><span class="eyebrow">{copy["module"]}</span><span class="topology">{html.escape(topology_text)}</span><h2>{html.escape(module["name"])}</h2><p>{html.escape(module["responsibility"])}</p></div><div class="module-paths">{chips(module["source_paths"])}</div></div>
+<div class="diagram-key"><span></span>{copy["diagram_key"]}</div>
+<div class="diagram module-diagram" data-diagram="module:{html.escape(module['id'])}"><span class="empty">{copy["drawing"]}</span></div>
 <div class="nodes">{''.join(node_cards)}</div>
 </section>'''
         )
@@ -271,7 +339,7 @@ def html_output(
     diagram_json = json.dumps(diagrams, ensure_ascii=False).replace("</", "<\\/")
     viz_json = json.dumps(viz_module_base64)
     return f'''<!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="{copy["html_language"]}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{html.escape(system_map["system"]["name"])} · System Map</title>
 <style>
 :root{{--ink:#172033;--muted:#667085;--line:#d8dee9;--paper:#f4f7fb;--card:#fff;--blue:#2457d6;--blue-soft:#eaf0ff;--violet:#6d3fc0;--green:#13795b;--amber:#9a6700}}
@@ -288,9 +356,9 @@ main{{max-width:1180px;margin:auto;padding:28px 20px 80px}}.overview,.module{{ba
 h6{{font-size:13px;margin:12px 0 3px}}
 @media(max-width:760px){{h1{{font-size:30px}}.module-heading{{display:block}}.module-paths{{text-align:left;max-width:none;margin-top:12px}}summary{{grid-template-columns:auto 1fr}}.summary-purpose{{grid-column:1/-1}}.io{{grid-template-columns:1fr}}}}
 </style></head><body>
-<header class="top"><span class="eyebrow">CODEBASE SYSTEM MAP</span><h1>{html.escape(system_map["system"]["name"])}</h1><p>{html.escape(system_map["system"]["summary"])}</p></header>
-<div class="sticky"><nav class="nav"><a href="#overview">系统总览</a>{navigation}</nav></div>
-<main><section class="overview" id="overview"><span class="eyebrow">SYSTEM FLOW</span><h2>整体架构</h2><p>实线表示主调用路径；虚线表示读取、写入、返回或慢任务关系。点击模块可下钻。</p><div class="diagram" data-diagram="system"><span class="empty">正在绘制...</span></div><div class="overview-modules">{overview_legend}</div></section>{''.join(modules_html)}</main>
+<header class="top"><span class="eyebrow">{copy["map_label"]}</span><h1>{html.escape(system_map["system"]["name"])}</h1><p>{html.escape(system_map["system"]["summary"])}</p></header>
+<div class="sticky"><nav class="nav"><a href="#overview">{copy["system_overview"]}</a>{navigation}</nav></div>
+<main><section class="overview" id="overview"><span class="eyebrow">{copy["system_flow"]}</span><h2>{copy["overall_architecture"]}</h2><p>{copy["overview_help"]}</p><div class="diagram" data-diagram="system"><span class="empty">{copy["drawing"]}</span></div><div class="overview-modules">{overview_legend}</div></section>{''.join(modules_html)}</main>
 <script type="application/json" id="system-map-data">{map_json}</script>
 <script type="application/json" id="diagram-data">{diagram_json}</script>
 <script type="module">
@@ -305,7 +373,7 @@ try {{
   }}
 }} catch (error) {{
   for (const target of document.querySelectorAll("[data-diagram]")) {{
-    target.innerHTML = '<span class="empty">图形渲染失败：' + String(error) + '</span>';
+    target.innerHTML = '<span class="empty">{copy["diagram_error"]}' + String(error) + '</span>';
   }}
 }}
 </script>

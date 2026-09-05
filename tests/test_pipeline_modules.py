@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from codebase_map.compiler import compile_system_map  # noqa: E402
+from codebase_map.compiler import compile_system_map, resolve_output_language  # noqa: E402
 from codebase_map.document import export_system_map  # noqa: E402
 from codebase_map.evidence import collect_evidence  # noqa: E402
 from codebase_map.models import ApiConfig, EvidenceBundle  # noqa: E402
@@ -61,6 +61,14 @@ def all_node_kinds_map() -> dict:
 
 
 class PipelineModuleTests(unittest.TestCase):
+    def test_output_language_follows_project_documents_unless_overridden(self):
+        chinese_documents = [{"content": "1: 这是一个面向产品团队的系统，负责分析代码并生成架构图。"}]
+        english_documents = [{"content": "1: This project maps a codebase for product teams."}]
+
+        self.assertEqual("zh", resolve_output_language("auto", chinese_documents))
+        self.assertEqual("en", resolve_output_language("auto", english_documents))
+        self.assertEqual("en", resolve_output_language("en", chinese_documents))
+
     def test_compiler_accepts_a_synthesizer_at_its_internal_seam(self):
         calls: list[dict] = []
 
@@ -100,6 +108,8 @@ class PipelineModuleTests(unittest.TestCase):
             self.assertIn('id="system-map-data"', html)
             self.assertIn('id="diagram-data"', html)
             self.assertIn('await import("data:text/javascript;base64," + encoded)', html)
+            self.assertIn('<html lang="en">', html)
+            self.assertIn('>System overview</a>', html)
             self.assertGreater(len(html), 1_000_000)
             self.assertIsNone(artifacts.markdown)
             self.assertIsNone(artifacts.data)
@@ -122,6 +132,28 @@ class PipelineModuleTests(unittest.TestCase):
                 "Artifact",
                 artifacts.html.read_text(encoding="utf-8"),
             )
+
+    def test_compiler_records_the_resolved_output_language(self):
+        evidence = EvidenceBundle(
+            "sample",
+            {},
+            ({"content": "1: 这是一个使用中文说明架构和产品行为的项目文档。"},),
+            (),
+        )
+        system_map = compile_system_map(
+            evidence,
+            ApiConfig("https://example.invalid/v1", "secret", "test-model"),
+            synthesizer=lambda **_: raw_map(),
+        )
+
+        self.assertEqual("zh", system_map["system"]["language"])
+        with tempfile.TemporaryDirectory() as directory:
+            html = export_system_map(system_map, Path(directory)).html.read_text(
+                encoding="utf-8"
+            )
+
+        self.assertIn('<html lang="zh-CN">', html)
+        self.assertIn(">系统总览</a>", html)
 
     def test_document_interface_writes_debug_artifacts_only_when_requested(self):
         evidence = EvidenceBundle("sample", {}, (), ())

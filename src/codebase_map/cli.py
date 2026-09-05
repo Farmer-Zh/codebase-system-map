@@ -13,7 +13,11 @@ def parser() -> argparse.ArgumentParser:
     root.add_argument("-o", "--output", type=Path, help="Output directory (default: ./generated/<repo>)")
     root.add_argument("--config", type=Path, default=Path(".env"), help="File containing URL, KEY, and MODEL")
     root.add_argument("--work-dir", type=Path, default=Path(".codebase-map"), help="CodeWiki cache/database directory")
-    root.add_argument("--language", default="zh", help="Output language (default: zh)")
+    root.add_argument(
+        "--language",
+        default="auto",
+        help="Output language: auto, zh, or en (default: auto)",
+    )
     root.add_argument("--force-analysis", action="store_true", help="Discard CodeWiki's incremental analysis cache")
     root.add_argument("--dry-run", action="store_true", help="Collect and size evidence without calling the LLM")
     root.add_argument(
