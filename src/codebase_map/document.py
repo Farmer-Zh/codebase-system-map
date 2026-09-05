@@ -63,6 +63,7 @@ def module_dot(system_map: dict[str, Any], module_id: str) -> str:
         "llm": "#ede9fe",
         "tool": "#dcfce7",
         "store": "#fef3c7",
+        "artifact": "#e0f2fe",
         "output": "#ffe4e6",
     }
     lines = [
@@ -87,7 +88,7 @@ def module_dot(system_map: dict[str, Any], module_id: str) -> str:
         prompt_mark = "  · Prompt" if node["prompts"] else ""
         label = f'{node["name"]}\n{node["kind"]}{prompt_mark}'
         lines.append(
-            f'"{dot_escape(node["id"])}" [label="{dot_escape(label)}", fillcolor="{colors[node["kind"]]}", URL="#node-{dot_escape(node["id"])}", target="_top"];'
+            f'"{dot_escape(node["id"])}" [label="{dot_escape(label)}", fillcolor="{colors.get(node["kind"], colors["stage"])}", URL="#node-{dot_escape(node["id"])}", target="_top"];'
         )
     for edge in internal:
         label = f' [label="{dot_escape(edge["label"])}"]' if edge["label"] else ""
@@ -282,7 +283,7 @@ main{{max-width:1180px;margin:auto;padding:28px 20px 80px}}.overview,.module{{ba
 .diagram-key{{display:flex;align-items:center;gap:7px;margin:0 0 8px;color:#7b8494;font-size:12px}}.diagram-key span{{width:22px;height:12px;border:1.5px dashed #98a2b3;border-radius:4px;background:#eef2f6}}
 .topology{{display:inline-block;margin-left:8px;padding:2px 7px;border-radius:999px;background:#eef2f6;color:#596273;font-size:11px;font-weight:700}}
 .nodes{{display:grid;gap:10px;margin-top:18px}}.node-card{{border:1px solid var(--line);border-radius:11px;background:#fff;scroll-margin-top:76px}}.node-card[open]{{border-color:#9bb2ef;box-shadow:0 4px 16px rgba(36,87,214,.08)}}summary{{cursor:pointer;list-style:none;display:grid;grid-template-columns:auto minmax(140px,240px) 1fr;align-items:center;gap:12px;padding:14px 16px}}summary::-webkit-details-marker{{display:none}}.summary-purpose{{color:var(--muted)}}
-.kind{{font-size:10px;text-transform:uppercase;font-weight:800;padding:3px 7px;border-radius:999px;background:#eef2f6}}.kind.llm{{color:var(--violet);background:#f1eafe}}.kind.store{{color:var(--amber);background:#fff4ce}}.kind.tool{{color:var(--green);background:#dcfae6}}.kind.entry,.kind.output{{color:var(--blue);background:var(--blue-soft)}}
+.kind{{font-size:10px;text-transform:uppercase;font-weight:800;padding:3px 7px;border-radius:999px;background:#eef2f6}}.kind.llm{{color:var(--violet);background:#f1eafe}}.kind.store{{color:var(--amber);background:#fff4ce}}.kind.tool{{color:var(--green);background:#dcfae6}}.kind.artifact{{color:#0369a1;background:#e0f2fe}}.kind.entry,.kind.output{{color:var(--blue);background:var(--blue-soft)}}
 .node-body{{border-top:1px solid var(--line);padding:18px}}.io{{display:grid;grid-template-columns:1fr 1fr;gap:18px}}h5{{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#667085;margin:0 0 8px}}.chip{{display:inline-block;padding:4px 8px;margin:2px 4px 2px 0;background:#f2f4f7;border-radius:7px;color:#344054;font-size:13px}}.implementation,.prompt,.no-prompt{{margin-top:16px}}.prompt{{border-top:1px solid var(--line);padding-top:16px}}.prompt-source{{font:12px/1.5 Consolas,monospace;color:var(--blue);margin-bottom:6px}}pre{{white-space:pre-wrap;overflow-wrap:anywhere;max-height:420px;overflow:auto;background:#101828;color:#e4e7ec;border-radius:9px;padding:16px;font:12px/1.6 Consolas,monospace}}.no-prompt,.empty{{color:#98a2b3;font-size:13px}}
 h6{{font-size:13px;margin:12px 0 3px}}
 @media(max-width:760px){{h1{{font-size:30px}}.module-heading{{display:block}}.module-paths{{text-align:left;max-width:none;margin-top:12px}}summary{{grid-template-columns:auto 1fr}}.summary-purpose{{grid-column:1/-1}}.io{{grid-template-columns:1fr}}}}

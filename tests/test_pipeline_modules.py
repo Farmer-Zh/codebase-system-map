@@ -34,6 +34,32 @@ def raw_map() -> dict:
     }
 
 
+def all_node_kinds_map() -> dict:
+    kinds = ("entry", "stage", "llm", "tool", "store", "artifact", "output")
+    return {
+        "system": {"name": "All kinds", "summary": "Every supported node kind."},
+        "modules": [{"id": "pipeline", "name": "Pipeline"}],
+        "nodes": [
+            {
+                "id": kind,
+                "module_id": "pipeline",
+                "name": kind.title(),
+                "kind": kind,
+            }
+            for kind in kinds
+        ],
+        "edges": [
+            {
+                "from": source,
+                "to": target,
+                "type": "calls",
+                "label": "next",
+            }
+            for source, target in zip(kinds, kinds[1:])
+        ],
+    }
+
+
 class PipelineModuleTests(unittest.TestCase):
     def test_compiler_accepts_a_synthesizer_at_its_internal_seam(self):
         calls: list[dict] = []
@@ -79,6 +105,23 @@ class PipelineModuleTests(unittest.TestCase):
             self.assertIsNone(artifacts.data)
             self.assertFalse((Path(directory) / "system-map.md").exists())
             self.assertFalse((Path(directory) / "system-map.json").exists())
+
+    def test_document_supports_every_compiler_node_kind(self):
+        evidence = EvidenceBundle("sample", {}, (), ())
+        system_map = compile_system_map(
+            evidence,
+            ApiConfig("https://example.invalid/v1", "secret", "test-model"),
+            synthesizer=lambda **_: all_node_kinds_map(),
+        )
+
+        with tempfile.TemporaryDirectory() as directory:
+            artifacts = export_system_map(system_map, Path(directory))
+
+            self.assertTrue(artifacts.html.is_file())
+            self.assertIn(
+                "Artifact",
+                artifacts.html.read_text(encoding="utf-8"),
+            )
 
     def test_document_interface_writes_debug_artifacts_only_when_requested(self):
         evidence = EvidenceBundle("sample", {}, (), ())
