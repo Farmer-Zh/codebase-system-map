@@ -9,7 +9,7 @@ Repository
   → CodeWiki extracts traceable code facts
   → LLM translates implementation into product semantics
   → NetworkX reconstructs module topology
-  → Viz.js renders self-contained SVG diagrams
+  → standalone HTML renders diagrams locally with bundled Viz.js
   → system-map.html
 ```
 
@@ -27,14 +27,13 @@ Repository
 - 每个模块有独立小图，并明确输入、输出和并行分支。
 - 普通 Web 应用、后台任务、数据管线和 AI 工作流使用同一入口。
 - Prompt 只在代码或文档存在证据时展示，并保留来源路径和行号。
-- HTML 内嵌 SVG、样式和数据，不依赖 CDN 或本地服务器。
+- HTML 内嵌 Viz.js、Graphviz WebAssembly、样式和数据，不依赖 CDN、本地服务器或 Node.js。
 - CodeWiki 分析结果增量缓存，重复生成不必完整重扫。
 - 不使用 LiteLLM；只需要 OpenAI-compatible URL、Key 和 Model。
 
 ## Requirements
 
 - Python 3.12+
-- Node.js 18+
 - 一个 OpenAI-compatible LLM API
 
 当前版本已在 Windows 完成端到端验证。核心 Python 包和生成的 HTML 不绑定操作系统；macOS/Linux 尚待持续集成验证。
@@ -61,12 +60,6 @@ macOS/Linux：
 ```bash
 source .venv/bin/activate
 python -m pip install .
-```
-
-也可以在 Windows 开发目录运行：
-
-```powershell
-.\scripts\setup.ps1
 ```
 
 ## API configuration
@@ -110,9 +103,8 @@ codebase-map /path/to/repository \
 --work-dir PATH     CodeWiki 缓存和 SQLite 数据库目录
 --force-analysis    丢弃增量缓存并重新分析
 --dry-run           只收集并统计证据，不调用 LLM 或渲染图
+--debug-artifacts   额外生成 Markdown 和 JSON 工程产物
 ```
-
-旧的 `repo-atlas` 和 `living-map` 命令暂时作为兼容入口保留。
 
 ## Output
 
@@ -120,37 +112,10 @@ codebase-map /path/to/repository \
 
 ```text
 system-map.html   面向人的主要交付物，可作为单文件分享
-system-map.md     供工程文档和 Git diff 使用的 Mermaid 版本
-system-map.json   供调试、二次渲染和自动化使用的结构化数据
 ```
 
-产品人员通常只需要 `system-map.html`。Markdown 和 JSON 是工程侧产物，不是阅读 HTML 的依赖。
-
-## Python API
-
-```python
-from pathlib import Path
-from codebase_map import BuildOptions, build_repository
-
-result = build_repository(
-    "/path/to/repository",
-    BuildOptions(
-        config=Path("/path/to/codebase-map.env"),
-        output_directory=Path("/path/to/output"),
-        language="zh",
-    ),
-)
-
-print(result.html)
-```
-
-公共边界是：
-
-```text
-build_repository(repository, options) -> BuildResult
-```
-
-CodeWiki、模型调用、拓扑重建和图形渲染均封装在内部，可以独立替换。
+需要排查生成结果或接入自动化时，使用 `--debug-artifacts` 额外生成
+`system-map.md` 和 `system-map.json`。它们不是阅读 HTML 的依赖。
 
 ## Architecture
 
@@ -164,11 +129,11 @@ export_system_map(...)    -> ArtifactSet
 
 - **Evidence Collector**：隐藏 CodeWiki 数据库、架构文档和源码 Prompt 的扫描细节。
 - **System Map Compiler**：让 LLM 选择运行语义和产品名称，再使用 NetworkX 构造模块接口、分支和汇合点，并执行结构质量检查。
-- **Document Exporter**：让 Viz.js SVG、Mermaid 和 JSON 消费同一份 SystemMap，并写出可独立分享的 HTML。
+- **Document Exporter**：把 Viz.js 和 Graphviz WebAssembly 内嵌到 HTML，让浏览器离线生成 SVG；调试模式下再导出 Mermaid 和 JSON。
 
 build_repository(...) 只负责编排这三个阶段；数据通过 EvidenceBundle、SystemMap 和 ArtifactSet 显式传递。
 
-更完整的产品模型见 [codebase_system_map.md](codebase_system_map.md)。开源组件选型与边界记录在 [docs](docs/) 中。
+开源组件选型与早期设计研究记录在 [docs](docs/) 中。
 
 ## Development
 
@@ -187,15 +152,13 @@ python -m pip wheel . --no-deps --no-build-isolation --wheel-dir dist
 主要实现位于：
 
 ```text
-scripts/living_map/build.py       构建编排与公共接口实现
-scripts/living_map/evidence.py    代码库与 CodeWiki 证据收集
-scripts/living_map/compiler.py    LLM 合成、规范化与结构验证
-scripts/living_map/document.py    图形渲染与静态文档导出
-scripts/living_map/generator.py   三阶段兼容编排入口
-scripts/living_map/models.py      阶段间的显式数据类型
-scripts/living_map/topology.py    Module View Builder 与 Quality Gate
-scripts/living_map/assets/        随包分发的 Viz.js 渲染适配器
-scripts/codebase_map/             新公共 Python 命名空间
+src/codebase_map/                 唯一的应用包
+  build.py                        CodeWiki 调用与完整构建流程
+  evidence.py                     代码库与 CodeWiki 证据收集
+  compiler.py                     LLM 合成、规范化与结构验证
+  document.py                     standalone HTML 与调试产物
+  topology.py                     Module View Builder 与 Quality Gate
+  assets/                         内嵌到 HTML 的 Viz.js
 ```
 
 ## Open-source components
@@ -207,7 +170,7 @@ Codebase System Map 主要组合以下开源模块：
 - [Viz.js](https://viz-js.com/) — Graphviz WebAssembly SVG 渲染。
 - [OpenAI Python SDK](https://github.com/openai/openai-python) — OpenAI-compatible API 客户端。
 
-Viz.js 的随包许可证位于 `scripts/living_map/assets/VIZ_JS_LICENSE.txt`。
+Viz.js 的随包许可证位于 `src/codebase_map/assets/VIZ_JS_LICENSE.txt`。
 
 ## License
 

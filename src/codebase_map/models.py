@@ -24,6 +24,5 @@ class EvidenceBundle:
 @dataclass(frozen=True)
 class ArtifactSet:
     html: Path
-    markdown: Path
-    data: Path
-
+    markdown: Path | None = None
+    data: Path | None = None

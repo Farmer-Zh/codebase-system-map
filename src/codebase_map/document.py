@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
+import base64
 import html
 import json
 import re
-import subprocess
-import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -107,16 +106,12 @@ def module_dot(system_map: dict[str, Any], module_id: str) -> str:
     return "\n".join(lines)
 
 
-def render_diagrams(system_map: dict[str, Any], node: str, script: Path) -> dict[str, str]:
+def diagram_sources(system_map: dict[str, Any]) -> dict[str, str]:
+    """Return Graphviz sources for browser-side offline rendering."""
     diagrams = {"system": system_dot(system_map)}
     for module in system_map["modules"]:
         diagrams[f'module:{module["id"]}'] = module_dot(system_map, module["id"])
-    with tempfile.TemporaryDirectory(prefix="codebase-map-") as temp_directory:
-        source = Path(temp_directory) / "diagrams.json"
-        target = Path(temp_directory) / "rendered.json"
-        source.write_text(json.dumps(diagrams, ensure_ascii=False), encoding="utf-8")
-        subprocess.run([node, str(script), str(source), str(target)], check=True)
-        return json.loads(target.read_text(encoding="utf-8"))
+    return diagrams
 
 
 def mermaid_id(value: str) -> str:
@@ -211,7 +206,11 @@ def chips(values: list[str]) -> str:
     return "".join(f'<span class="chip">{html.escape(value)}</span>' for value in values)
 
 
-def html_output(system_map: dict[str, Any], diagrams: dict[str, str]) -> str:
+def html_output(
+    system_map: dict[str, Any],
+    diagrams: dict[str, str],
+    viz_module_base64: str,
+) -> str:
     modules_html: list[str] = []
     topology_names = {
         "single": "单节点",
@@ -255,7 +254,7 @@ def html_output(system_map: dict[str, Any], diagrams: dict[str, str]) -> str:
             f'''<section class="module" id="module-{html.escape(module["id"])}">
 <div class="module-heading"><div><span class="eyebrow">MODULE</span><span class="topology">{html.escape(topology_text)}</span><h2>{html.escape(module["name"])}</h2><p>{html.escape(module["responsibility"])}</p></div><div class="module-paths">{chips(module["source_paths"])}</div></div>
 <div class="diagram-key"><span></span>虚线节点表示该模块的外部接口</div>
-<div class="diagram module-diagram">{diagrams.get('module:' + module['id'], '')}</div>
+<div class="diagram module-diagram" data-diagram="module:{html.escape(module['id'])}"><span class="empty">正在绘制...</span></div>
 <div class="nodes">{''.join(node_cards)}</div>
 </section>'''
         )
@@ -268,6 +267,8 @@ def html_output(system_map: dict[str, Any], diagrams: dict[str, str]) -> str:
         for module in system_map["modules"]
     )
     map_json = json.dumps(system_map, ensure_ascii=False).replace("</", "<\\/")
+    diagram_json = json.dumps(diagrams, ensure_ascii=False).replace("</", "<\\/")
+    viz_json = json.dumps(viz_module_base64)
     return f'''<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{html.escape(system_map["system"]["name"])} · System Map</title>
@@ -286,32 +287,57 @@ main{{max-width:1180px;margin:auto;padding:28px 20px 80px}}.overview,.module{{ba
 h6{{font-size:13px;margin:12px 0 3px}}
 @media(max-width:760px){{h1{{font-size:30px}}.module-heading{{display:block}}.module-paths{{text-align:left;max-width:none;margin-top:12px}}summary{{grid-template-columns:auto 1fr}}.summary-purpose{{grid-column:1/-1}}.io{{grid-template-columns:1fr}}}}
 </style></head><body>
-<header class="top"><span class="eyebrow">LIVING AI SYSTEM MAP</span><h1>{html.escape(system_map["system"]["name"])}</h1><p>{html.escape(system_map["system"]["summary"])}</p></header>
+<header class="top"><span class="eyebrow">CODEBASE SYSTEM MAP</span><h1>{html.escape(system_map["system"]["name"])}</h1><p>{html.escape(system_map["system"]["summary"])}</p></header>
 <div class="sticky"><nav class="nav"><a href="#overview">系统总览</a>{navigation}</nav></div>
-<main><section class="overview" id="overview"><span class="eyebrow">SYSTEM FLOW</span><h2>整体架构</h2><p>实线表示主调用路径；虚线表示读取、写入、返回或慢任务关系。点击模块可下钻。</p><div class="diagram">{diagrams.get("system", "")}</div><div class="overview-modules">{overview_legend}</div></section>{''.join(modules_html)}</main>
+<main><section class="overview" id="overview"><span class="eyebrow">SYSTEM FLOW</span><h2>整体架构</h2><p>实线表示主调用路径；虚线表示读取、写入、返回或慢任务关系。点击模块可下钻。</p><div class="diagram" data-diagram="system"><span class="empty">正在绘制...</span></div><div class="overview-modules">{overview_legend}</div></section>{''.join(modules_html)}</main>
 <script type="application/json" id="system-map-data">{map_json}</script>
+<script type="application/json" id="diagram-data">{diagram_json}</script>
+<script type="module">
+try {{
+  const encoded = {viz_json};
+  const vizModule = await import("data:text/javascript;base64," + encoded);
+  const viz = await vizModule.instance();
+  const sources = JSON.parse(document.getElementById("diagram-data").textContent);
+  for (const target of document.querySelectorAll("[data-diagram]")) {{
+    const dot = sources[target.dataset.diagram];
+    if (dot) target.innerHTML = viz.renderString(dot, {{format: "svg", engine: "dot"}});
+  }}
+}} catch (error) {{
+  for (const target of document.querySelectorAll("[data-diagram]")) {{
+    target.innerHTML = '<span class="empty">图形渲染失败：' + String(error) + '</span>';
+  }}
+}}
+</script>
 </body></html>'''
 
 
-def export_system_map(system_map: SystemMap, output_directory: Path, node: str) -> ArtifactSet:
-    """Render one map and write its self-contained document artifacts."""
+def export_system_map(
+    system_map: SystemMap,
+    output_directory: Path,
+    *,
+    debug_artifacts: bool = False,
+) -> ArtifactSet:
+    """Write the standalone HTML and optional engineering artifacts."""
     output = output_directory.resolve()
     output.mkdir(parents=True, exist_ok=True)
-    diagrams = render_diagrams(
-        system_map,
-        node,
-        Path(__file__).parent / "assets" / "render-dot.mjs",
-    )
+    diagrams = diagram_sources(system_map)
+    viz_module_base64 = base64.b64encode(
+        (Path(__file__).parent / "assets" / "viz.js").read_bytes()
+    ).decode("ascii")
     artifacts = ArtifactSet(
         html=output / "system-map.html",
-        markdown=output / "system-map.md",
-        data=output / "system-map.json",
+        markdown=(output / "system-map.md") if debug_artifacts else None,
+        data=(output / "system-map.json") if debug_artifacts else None,
     )
-    artifacts.data.write_text(
-        json.dumps(system_map, ensure_ascii=False, indent=2), encoding="utf-8"
+    artifacts.html.write_text(
+        html_output(system_map, diagrams, viz_module_base64),
+        encoding="utf-8",
     )
-    artifacts.markdown.write_text(markdown_output(system_map), encoding="utf-8")
-    artifacts.html.write_text(html_output(system_map, diagrams), encoding="utf-8")
+    if artifacts.data and artifacts.markdown:
+        artifacts.data.write_text(
+            json.dumps(system_map, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+        artifacts.markdown.write_text(markdown_output(system_map), encoding="utf-8")
     return artifacts
 
 

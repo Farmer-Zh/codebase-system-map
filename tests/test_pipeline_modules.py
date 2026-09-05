@@ -6,16 +6,15 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
 
 
 ROOT = Path(__file__).parents[1]
-sys.path.insert(0, str(ROOT / "scripts"))
+sys.path.insert(0, str(ROOT / "src"))
 
-from living_map.compiler import compile_system_map  # noqa: E402
-from living_map.document import export_system_map  # noqa: E402
-from living_map.evidence import collect_evidence  # noqa: E402
-from living_map.models import ApiConfig, EvidenceBundle  # noqa: E402
+from codebase_map.compiler import compile_system_map  # noqa: E402
+from codebase_map.document import export_system_map  # noqa: E402
+from codebase_map.evidence import collect_evidence  # noqa: E402
+from codebase_map.models import ApiConfig, EvidenceBundle  # noqa: E402
 
 
 def raw_map() -> dict:
@@ -67,22 +66,40 @@ class PipelineModuleTests(unittest.TestCase):
             ApiConfig("https://example.invalid/v1", "secret", "test-model"),
             synthesizer=lambda **_: raw_map(),
         )
-        diagrams = {
-            "system": "<svg id='overview'></svg>",
-            "module:input": "<svg id='input'></svg>",
-            "module:output": "<svg id='output'></svg>",
-        }
-
         with tempfile.TemporaryDirectory() as directory:
-            with patch("living_map.document.render_diagrams", return_value=diagrams):
-                artifacts = export_system_map(system_map, Path(directory), "node")
+            artifacts = export_system_map(system_map, Path(directory))
 
             html = artifacts.html.read_text(encoding="utf-8")
             self.assertIn("<!doctype html>", html)
-            self.assertIn("<svg id='overview'></svg>", html)
             self.assertIn('id="system-map-data"', html)
+            self.assertIn('id="diagram-data"', html)
+            self.assertIn('await import("data:text/javascript;base64," + encoded)', html)
+            self.assertGreater(len(html), 1_000_000)
+            self.assertIsNone(artifacts.markdown)
+            self.assertIsNone(artifacts.data)
+            self.assertFalse((Path(directory) / "system-map.md").exists())
+            self.assertFalse((Path(directory) / "system-map.json").exists())
+
+    def test_document_interface_writes_debug_artifacts_only_when_requested(self):
+        evidence = EvidenceBundle("sample", {}, (), ())
+        system_map = compile_system_map(
+            evidence,
+            ApiConfig("https://example.invalid/v1", "secret", "test-model"),
+            synthesizer=lambda **_: raw_map(),
+        )
+
+        with tempfile.TemporaryDirectory() as directory:
+            artifacts = export_system_map(
+                system_map,
+                Path(directory),
+                debug_artifacts=True,
+            )
+
             self.assertTrue(artifacts.markdown.is_file())
-            self.assertEqual("1.1", json.loads(artifacts.data.read_text(encoding="utf-8"))["schema_version"])
+            self.assertEqual(
+                "1.1",
+                json.loads(artifacts.data.read_text(encoding="utf-8"))["schema_version"],
+            )
 
     def test_evidence_interface_hides_repository_and_database_scanning(self):
         with tempfile.TemporaryDirectory() as directory:

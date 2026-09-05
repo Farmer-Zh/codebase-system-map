@@ -11,7 +11,10 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from .generator import generate_repository_map
+from .compiler import compile_system_map, load_api_config, synthesis_messages
+from .document import export_system_map
+from .evidence import collect_evidence
+from .models import SystemMap
 
 
 @dataclass(frozen=True)
@@ -22,6 +25,7 @@ class BuildOptions:
     language: str = "zh"
     force_analysis: bool = False
     dry_run: bool = False
+    debug_artifacts: bool = False
 
 
 @dataclass(frozen=True)
@@ -29,8 +33,8 @@ class BuildResult:
     repository_id: str
     output_directory: Path
     html: Path
-    markdown: Path
-    data: Path
+    markdown: Path | None
+    data: Path | None
     quality: dict | None
 
 
@@ -65,6 +69,64 @@ def _run_json(command: list[str], *, cwd: Path, environment: dict[str, str]) -> 
         raise RuntimeError(f"Command did not return JSON: {' '.join(command[:2])}") from error
 
 
+def _generate_system_map(
+    *,
+    repo_id: str,
+    repository: Path,
+    output_directory: Path,
+    database: Path,
+    config: Path,
+    language: str,
+    dry_run: bool,
+    debug_artifacts: bool,
+) -> SystemMap | None:
+    evidence = collect_evidence(repository, database, repo_id)
+    print(
+        f"Evidence: {len(evidence.documents)} architecture documents, "
+        f"{len(evidence.prompt_assets)} prompt assets, "
+        f"{len(evidence.facts['module_candidates'])} code modules",
+        flush=True,
+    )
+    request_chars = len(
+        synthesis_messages(
+            evidence.repository_name,
+            language,
+            evidence.facts,
+            list(evidence.documents),
+            list(evidence.prompt_assets),
+        )[1]["content"]
+    )
+    source_prompts = sum(
+        prompt["evidence_kind"] == "source_prompt" for prompt in evidence.prompt_assets
+    )
+    print(
+        f"Synthesis input: {request_chars:,} characters; source prompts={source_prompts}, "
+        f"documented prompts={len(evidence.prompt_assets) - source_prompts}",
+        flush=True,
+    )
+    if dry_run:
+        return None
+
+    system_map = compile_system_map(evidence, load_api_config(config), language)
+    export_system_map(
+        system_map,
+        output_directory,
+        debug_artifacts=debug_artifacts,
+    )
+    print(
+        f"Map generated: {len(system_map['modules'])} modules, {len(system_map['nodes'])} nodes, "
+        f"{sum(len(item['prompts']) for item in system_map['nodes'])} attached prompts",
+        flush=True,
+    )
+    quality = system_map["quality"]
+    print(
+        f"Structure quality: {quality['status']}; edge coverage="
+        f"{quality['metrics']['edge_coverage']:.0%}; warnings={len(quality['warnings'])}",
+        flush=True,
+    )
+    return system_map
+
+
 def build_repository(repository: str | Path, options: BuildOptions | None = None) -> BuildResult:
     """Analyze one repository and write its product-readable system map."""
     options = options or BuildOptions()
@@ -87,8 +149,6 @@ def build_repository(repository: str | Path, options: BuildOptions | None = None
     database = work / "codewiki.sqlite3"
 
     codewiki = _executable("codewiki")
-    # A dry run stops before SVG rendering, so it should not require Node.js.
-    node = _executable("node") if not options.dry_run else "node"
     environment = dict(os.environ)
     environment["CODEWIKI_DATABASE_URL"] = f"sqlite+aiosqlite:///{database.as_posix()}"
 
@@ -109,21 +169,21 @@ def build_repository(repository: str | Path, options: BuildOptions | None = None
     subprocess.run(analyze, cwd=work, env=environment, check=True)
 
     print("[3/3] Building product-readable system map", flush=True)
-    system_map = generate_repository_map(
+    system_map = _generate_system_map(
         repo_id=repo_id,
         repository=root,
         output_directory=output,
         database=database,
         config=config,
         language=options.language,
-        node=node,
         dry_run=options.dry_run,
+        debug_artifacts=options.debug_artifacts,
     )
     return BuildResult(
         repository_id=repo_id,
         output_directory=output,
         html=output / "system-map.html",
-        markdown=output / "system-map.md",
-        data=output / "system-map.json",
+        markdown=(output / "system-map.md") if options.debug_artifacts else None,
+        data=(output / "system-map.json") if options.debug_artifacts else None,
         quality=system_map.get("quality") if system_map else None,
     )

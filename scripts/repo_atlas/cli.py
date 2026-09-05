@@ -1,5 +1,0 @@
-"""Compatibility command for the former RepoAtlas name."""
-
-from living_map.cli import main, parser
-
-__all__ = ["main", "parser"]

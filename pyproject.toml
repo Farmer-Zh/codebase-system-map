@@ -25,12 +25,10 @@ Issues = "https://github.com/Farmer-Zh/codebase-system-map/issues"
 
 [project.scripts]
 codebase-map = "codebase_map.cli:main"
-repo-atlas = "repo_atlas.cli:main"
-living-map = "living_map.cli:main"
 
 [tool.setuptools]
-package-dir = {"" = "scripts"}
-packages = ["living_map", "repo_atlas", "codebase_map"]
+package-dir = {"" = "src"}
+packages = ["codebase_map"]
 
 [tool.setuptools.package-data]
-living_map = ["assets/*"]
+codebase_map = ["assets/*"]

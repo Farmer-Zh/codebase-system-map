@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import sys
 from pathlib import Path
 
 
@@ -17,16 +16,16 @@ def parser() -> argparse.ArgumentParser:
     root.add_argument("--language", default="zh", help="Output language (default: zh)")
     root.add_argument("--force-analysis", action="store_true", help="Discard CodeWiki's incremental analysis cache")
     root.add_argument("--dry-run", action="store_true", help="Collect and size evidence without calling the LLM")
+    root.add_argument(
+        "--debug-artifacts",
+        action="store_true",
+        help="Also write system-map.md and system-map.json",
+    )
     return root
 
 
 def main(argv: list[str] | None = None) -> int:
-    arguments = list(sys.argv[1:] if argv is None else argv)
-    # Keep the earlier ``repo-atlas`` and ``living-map build <repo>`` spellings as compatibility
-    # alias while making the normal interface just ``codebase-map <repo>``.
-    if arguments and arguments[0] == "build":
-        arguments.pop(0)
-    args = parser().parse_args(arguments)
+    args = parser().parse_args(argv)
     from .build import BuildOptions, build_repository
 
     result = build_repository(
@@ -38,13 +37,14 @@ def main(argv: list[str] | None = None) -> int:
             language=args.language,
             force_analysis=args.force_analysis,
             dry_run=args.dry_run,
+            debug_artifacts=args.debug_artifacts,
         ),
     )
     if args.dry_run:
         print("Dry run complete; no artifacts written.")
     else:
         print("\nSystem map generated:")
-        print(f"  HTML:     {result.html}")
-        print(f"  Markdown: {result.markdown}")
-        print(f"  Data:     {result.data}")
+        print(f"  {result.html}")
+        if result.markdown and result.data:
+            print(f"Debug artifacts: {result.markdown}, {result.data}")
     return 0

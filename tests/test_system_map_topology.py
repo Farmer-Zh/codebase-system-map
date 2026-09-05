@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import importlib
 import sqlite3
 import sys
 import tempfile
@@ -9,14 +8,13 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).parents[1]
-SCRIPTS = ROOT / "scripts"
-sys.path.insert(0, str(SCRIPTS))
+SOURCE = ROOT / "src"
+sys.path.insert(0, str(SOURCE))
 
-from living_map.topology import enrich_system_map, module_view_for  # noqa: E402
-
-
-def load_generator():
-    return importlib.import_module("living_map.generator")
+from codebase_map.topology import enrich_system_map, module_view_for  # noqa: E402
+from codebase_map.compiler import normalize_map  # noqa: E402
+from codebase_map.document import module_dot  # noqa: E402
+from codebase_map.evidence import graph_facts  # noqa: E402
 
 
 def parallel_fixture() -> dict:
@@ -62,7 +60,6 @@ class TopologyTests(unittest.TestCase):
         self.assertEqual(1.0, system_map["quality"]["metrics"]["edge_coverage"])
 
     def test_normalization_always_builds_views_and_quality_report(self):
-        generator = load_generator()
         raw = {
             "system": {"name": "Fixture", "summary": ""},
             "modules": [{"id": "one", "name": "One"}, {"id": "two", "name": "Two"}],
@@ -72,22 +69,20 @@ class TopologyTests(unittest.TestCase):
             ],
             "edges": [{"from": "a", "to": "b", "type": "calls", "label": "request"}],
         }
-        system_map = generator.normalize_map(raw, [])
+        system_map = normalize_map(raw, [])
         self.assertEqual("1.1", system_map["schema_version"])
         self.assertEqual(2, len(system_map["module_views"]))
         self.assertEqual("passed", system_map["quality"]["status"])
 
     def test_renderer_consumes_saved_module_view_not_raw_edges(self):
-        generator = load_generator()
         system_map = enrich_system_map(parallel_fixture())
         system_map["edges"] = []
-        dot = generator.module_dot(system_map, "workers")
+        dot = module_dot(system_map, "workers")
         self.assertIn("alpha task", dot)
         self.assertIn("gamma patch", dot)
         self.assertGreaterEqual(dot.count(" -> "), 5)
 
     def test_codewiki_evidence_keeps_internal_calls(self):
-        generator = load_generator()
         with tempfile.TemporaryDirectory() as directory:
             database = Path(directory) / "codewiki.sqlite3"
             connection = sqlite3.connect(database)
@@ -103,7 +98,7 @@ class TopologyTests(unittest.TestCase):
             )
             connection.commit()
             connection.close()
-            facts = generator.graph_facts(database, "repo")
+            facts = graph_facts(database, "repo")
         runtime = next(module for module in facts["module_candidates"] if module["path"] == "runtime")
         self.assertEqual("dispatch", runtime["internal_relationships"][0]["from"])
         self.assertEqual("worker", runtime["internal_relationships"][0]["to"])
