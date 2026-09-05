@@ -154,12 +154,19 @@ CodeWiki、模型调用、拓扑重建和图形渲染均封装在内部，可以
 
 ## Architecture
 
-- **Evidence Collector**：从 CodeWiki、架构文档和源码 Prompt 收集带来源的事实。
-- **Semantic Synthesizer**：让 LLM 选择运行语义和产品名称，不让模型凭空决定拓扑。
-- **Module View Builder**：使用 NetworkX 计算模块接口、内部边、分支和汇合点。
-- **Quality Gate**：拒绝孤立节点，检查 canonical edge 是否进入模块视图。
-- **Diagram Adapter**：让 Viz.js SVG 和 Mermaid 消费同一份 Module View。
-- **Static Exporter**：把图、节点详情和数据内嵌到单个 HTML。
+生成流程只有三个内部接口：
+
+~~~text
+collect_evidence(...)     -> EvidenceBundle
+compile_system_map(...)   -> SystemMap
+export_system_map(...)    -> ArtifactSet
+~~~
+
+- **Evidence Collector**：隐藏 CodeWiki 数据库、架构文档和源码 Prompt 的扫描细节。
+- **System Map Compiler**：让 LLM 选择运行语义和产品名称，再使用 NetworkX 构造模块接口、分支和汇合点，并执行结构质量检查。
+- **Document Exporter**：让 Viz.js SVG、Mermaid 和 JSON 消费同一份 SystemMap，并写出可独立分享的 HTML。
+
+build_repository(...) 只负责编排这三个阶段；数据通过 EvidenceBundle、SystemMap 和 ArtifactSet 显式传递。
 
 更完整的产品模型见 [codebase_system_map.md](codebase_system_map.md)。开源组件选型与边界记录在 [docs](docs/) 中。
 
@@ -181,7 +188,11 @@ python -m pip wheel . --no-deps --no-build-isolation --wheel-dir dist
 
 ```text
 scripts/living_map/build.py       构建编排与公共接口实现
-scripts/living_map/generator.py   证据、LLM 合成与静态导出
+scripts/living_map/evidence.py    代码库与 CodeWiki 证据收集
+scripts/living_map/compiler.py    LLM 合成、规范化与结构验证
+scripts/living_map/document.py    图形渲染与静态文档导出
+scripts/living_map/generator.py   三阶段兼容编排入口
+scripts/living_map/models.py      阶段间的显式数据类型
 scripts/living_map/topology.py    Module View Builder 与 Quality Gate
 scripts/living_map/assets/        随包分发的 Viz.js 渲染适配器
 scripts/codebase_map/             新公共 Python 命名空间
