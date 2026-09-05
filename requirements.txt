@@ -1,0 +1,7 @@
+codewiki==0.6.5
+openai==2.54.0
+python-dotenv==1.2.3
+networkx==3.6.1
+# CodeWiki 0.6.5 crashes in native AST parsing with tree-sitter 0.26.0
+# on Windows/Python 3.13 (0xC0000005). Keep the last verified release.
+tree-sitter==0.25.2

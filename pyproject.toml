@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "repo-atlas"
+version = "0.1.0"
+description = "Turn a code repository into a product-readable system map"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.12"
+dependencies = [
+  "codewiki==0.6.5",
+  "networkx==3.6.1",
+  "openai==2.54.0",
+  "python-dotenv==1.2.3",
+  "tree-sitter==0.25.2",
+]
+
+[project.urls]
+Homepage = "https://github.com/Farmer-Zh/RepoAtlas"
+Repository = "https://github.com/Farmer-Zh/RepoAtlas.git"
+Issues = "https://github.com/Farmer-Zh/RepoAtlas/issues"
+
+[project.scripts]
+repo-atlas = "repo_atlas.cli:main"
+living-map = "living_map.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "scripts"}
+packages = ["living_map", "repo_atlas"]
+
+[tool.setuptools.package-data]
+living_map = ["assets/*"]
