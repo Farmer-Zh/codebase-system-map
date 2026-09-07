@@ -32,17 +32,11 @@ Graphviz and Expat as software included in object-code form.
 - License: MIT.
 - Local license text: `codebase-system-map/assets/licenses/EXPAT_LICENSE.txt`.
 
-## Not runtime dependencies
+## Project platform
 
-- Node.js 18+ is the execution platform for deterministic validation and
-  delivery; only built-in modules are used.
-- The GitHub Pages site is plain HTML, CSS, and JavaScript and loads no UI
-  framework, remote font, CDN asset, or analytics library.
-- Huey, Full Stack FastAPI Template, and OpenAI Agents SDK are public source
-  repositories analyzed for the showcases. Their code is not bundled as a
-  dependency.
-- “Notion-inspired” describes a visual direction only. This project is not
-  affiliated with Notion and does not use Notion code or assets.
+- Node.js 18+ and its built-in modules run deterministic validation and
+  delivery.
+- The GitHub Pages site is implemented in plain HTML, CSS, and JavaScript.
 
 This file is informational and does not replace the license texts shipped with
 the relevant components.

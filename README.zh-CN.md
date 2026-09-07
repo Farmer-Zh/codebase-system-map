@@ -207,7 +207,7 @@ DESIGN.md                          视觉设计方向
 
 ## 开发
 
-不需要 Python 环境或 API 配置：
+使用 Node.js 18 或更高版本运行确定性测试：
 
 ~~~powershell
 npm test
@@ -227,9 +227,6 @@ npm test
 | [Viz.js 3.29.0](https://github.com/mdaines/viz-js) | 每份 HTML 内嵌的 JavaScript 封装与 WebAssembly 图形渲染器 | MIT |
 | [Graphviz](https://graphviz.org/) | 在 Viz.js WebAssembly 中完成 DOT 布局并生成 SVG | Eclipse Public License 2.0 |
 | [Expat](https://github.com/libexpat/libexpat) | 由 Viz.js 对象代码间接包含的 XML 解析器 | MIT |
-
-三个案例仓库只是分析对象，不是项目依赖。当前 Skill 不使用 UI 框架、远程字体、
-CDN、统计服务、CodeWiki、LiteLLM 或 Python 运行时。
 
 完整说明见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)，许可证全文保存在
 [codebase-system-map/assets/licenses](codebase-system-map/assets/licenses/)。

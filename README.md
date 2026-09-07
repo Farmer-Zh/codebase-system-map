@@ -232,7 +232,7 @@ DESIGN.md                          visual direction
 
 ## Development
 
-No Python environment or API configuration is required.
+Run the deterministic test suite with Node.js 18 or newer:
 
 ~~~bash
 npm test
@@ -253,10 +253,6 @@ so diagrams continue to work offline:
 | [Viz.js 3.29.0](https://github.com/mdaines/viz-js) | JavaScript wrapper and WebAssembly graph renderer embedded in every HTML file | MIT |
 | [Graphviz](https://graphviz.org/) | DOT layout and SVG generation inside the Viz.js WebAssembly build | Eclipse Public License 2.0 |
 | [Expat](https://github.com/libexpat/libexpat) | XML parser included transitively in the Viz.js object-code distribution | MIT |
-
-The three showcase repositories are analysis subjects, not dependencies. No UI
-framework, remote font, CDN, analytics library, CodeWiki, LiteLLM, or Python
-runtime is used by the current Skill.
 
 See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and the complete license
 texts in [codebase-system-map/assets/licenses](codebase-system-map/assets/licenses/).
