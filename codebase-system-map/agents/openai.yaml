@@ -1,6 +1,6 @@
 interface:
   display_name: "Codebase System Map"
-  short_description: "Conversationally shape a system map from a repository"
-  default_prompt: "Use $codebase-system-map to design and generate a standalone HTML map of this repository. Infer what to emphasize or simplify from my request, and let me refine the result through follow-up conversation."
+  short_description: "Shape indexed repository facts into a readable system map"
+  default_prompt: "Use $codebase-system-map with an installed code-intelligence provider to generate a standalone HTML map of this repository, shaped for the reader and priorities in my request."
 policy:
   allow_implicit_invocation: true

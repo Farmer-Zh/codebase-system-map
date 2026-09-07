@@ -4,6 +4,17 @@ Codebase System Map is MIT-licensed. The generated standalone HTML documents
 also contain a vendored copy of `@viz-js/viz`, whose distribution header names
 Graphviz and Expat as software included in object-code form.
 
+## Code-intelligence integration
+
+### Codebase Memory
+
+- Project: <https://github.com/DeusData/codebase-memory-mcp>
+- Role: documented reference provider for repository indexing, architecture,
+  structural search, execution-path tracing, and bounded source retrieval.
+- License: MIT.
+- Distribution: installed separately and accessed through its Agent Skill or
+  MCP interface.
+
 ## Components bundled into generated HTML
 
 ### Viz.js 3.29.0

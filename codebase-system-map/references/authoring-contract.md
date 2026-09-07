@@ -14,7 +14,7 @@ sources[]
 prompts[]
 ```
 
-Do not add speculative fields or use presentation coordinates to compensate for an unclear model.
+Do not add speculative fields, provider-specific graph objects, or presentation coordinates to compensate for an unclear model.
 
 Set `meta.presentation` from `presentation-contract.md`. Preserve the user's natural-language intent in `reader_goal`, `priorities`, and `deemphasize`; use the enum fields only as normalized renderer hints. Treat the brief as an authoring decision, not a cosmetic theme: it controls which distinctions deserve separate modules or nodes, how labels are phrased, which prompts are promoted, and which content the renderer places first. Evidence requirements do not weaken when technical details are visually subordinate.
 
@@ -26,13 +26,13 @@ Set `meta.presentation` from `presentation-contract.md`. Preserve the user's nat
 
 ### Modules
 
-Follow the profile budgets in `presentation-contract.md`, but use fewer modules when a small repository has fewer evidence-backed responsibilities. A module is a product capability or coherent runtime responsibility with a meaningful boundary. Name it by what it does, such as "Request intake" or "Background execution," rather than by a folder, framework, layer suffix, or team name unless that name is itself meaningful to the reader.
+Follow the profile budgets in `presentation-contract.md`, but use fewer modules when a small repository has fewer evidence-backed responsibilities. A module is a product capability or coherent runtime responsibility with a meaningful boundary. Several provider clusters, packages, or symbols may collapse into one module; one cluster may split when it contains distinct reader-relevant responsibilities. Name the module by what it does, such as "Request intake" or "Background execution," rather than by a folder, framework, layer suffix, or team name unless that name is itself meaningful to the reader.
 
 Each module needs a concise responsibility and source references. Modules should collectively explain the main behavior without forcing readers to understand packages first.
 
 ### Nodes
 
-Keep no more than 30 important nodes, subject to schema limits and the selected detail level. A node is a meaningful stage, decision, store, external dependency, worker, or output - not every class or function. Merge ordinary linear implementation whenever splitting it would not change the intended reader's understanding.
+Keep no more than 30 important nodes, subject to schema limits and the selected detail level. A node is a meaningful stage, decision, store, external dependency, worker, or output - not every provider symbol, class, or function. Merge ordinary linear implementation whenever splitting it would not change the intended reader's understanding.
 
 For every node, describe its purpose, inputs, outputs, module membership, and source references using only schema-supported fields and kinds. Preserve meaningful decision points, fan-out/fan-in, asynchronous dispatch, persistence, feedback, and user-visible results.
 
@@ -51,7 +51,7 @@ Use node kinds consistently:
 
 ## Edges and primary path
 
-Edges describe behavior or information moving between nodes. Select types and labels from the schema; keep labels short and meaningful. Avoid duplicating request/response pairs or low-level call graphs when one product-level relation explains the interaction.
+Edges describe behavior or information moving between nodes. Aggregate the provider's symbol-level calls, imports, route links, data flow, and async relations into the smallest reader-meaningful edge. Select types and labels from the schema; keep labels short and meaningful. Avoid duplicating request/response pairs or copying low-level call graphs when one product-level relation explains the interaction.
 
 Mark a clear primary path from at least one entry to at least one user-visible or downstream outcome. The primary path is an evidence-based author judgment, not a claim that other paths are unimportant. It must be continuous and readable. Represent supported branches, merges, asynchronous paths, and feedback explicitly rather than forcing everything into one linear chain.
 

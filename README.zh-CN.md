@@ -5,8 +5,9 @@
 [项目主页与在线案例](https://farmer-zh.github.io/codebase-system-map/zh/) · [English](README.md)
 
 Codebase System Map 是一个用于代码库可视化、软件架构说明和新人上手的开源
-Agent Skill。它让已经能够阅读仓库的 Coding Agent 沿真实运行路径理解代码，
-再生成一份可以离线打开和单文件分享的 HTML。
+Agent Skill。专用代码智能工具先为整个仓库建立索引，提供详细架构和执行路径；
+Coding Agent 再从这些事实中选择、整理并生成一份可以离线打开和单文件分享的
+HTML。
 
 - **按照读者设计内容：**直接说明文档给谁看、希望理解或决定什么。
 - **通过对话调整：**用自然语言修改模块、颗粒度、术语和展示重点。
@@ -16,7 +17,8 @@ Agent Skill。它让已经能够阅读仓库的 Coding Agent 沿真实运行路�
 
 ~~~text
 代码库
-  → Agent 沿关键运行路径阅读源码
+  → 代码智能工具索引符号与关系
+  → Agent 选择并解释与读者有关的运行路径
   → 有证据的 System Map IR
   → 本地确定性校验
   → 单文件 system-map.html
@@ -56,19 +58,29 @@ metadata.json 记录了仓库、commit、许可证、展示简报和内容数量
 ### 环境要求
 
 - 一个能够读取目标仓库并执行本地命令的 Coding Agent；
+- 一个代码库智能 Skill 或 MCP 工具；文档中的参考实现是
+  [Codebase Memory](https://github.com/DeusData/codebase-memory-mcp)；
 - Node.js 18 或更高版本；
 - Git 可选，但建议安装，以便在结果中记录分析版本。
 
 内置校验器和渲染器不需要安装依赖，也不会访问网络。
 
-### 1. 克隆仓库
+### 1. 安装代码智能工具
+
+按照 [Codebase Memory](https://github.com/DeusData/codebase-memory-mcp) 的平台说明
+完成安装，然后重新启动 Coding Agent。它会在本地把仓库索引为持久化知识图谱，
+并向 Skill 提供有范围限制的架构、搜索、路径追踪和源码片段能力。
+
+也可以换成其他具备这四项能力的代码库智能 Skill。
+
+### 2. 克隆仓库
 
 ~~~powershell
 git clone https://github.com/Farmer-Zh/codebase-system-map.git
 cd codebase-system-map
 ~~~
 
-### 2. 安装 Skill
+### 3. 安装 Skill
 
 Codex 本地安装，Windows PowerShell：
 
@@ -91,7 +103,7 @@ cp -R codebase-system-map/. "$HOME/.codex/skills/codebase-system-map/"
 codebase-system-map 目录。入口文件是
 [SKILL.md](codebase-system-map/SKILL.md)。
 
-### 3. 直接说明你要看的内容
+### 4. 直接说明你要看的内容
 
 给产品经理看：
 
@@ -157,8 +169,8 @@ HTML 已内嵌图形渲染器和 WebAssembly，不会启动本地服务器，也
 Skill 要求 Agent：
 
 1. 先确定仓库边界和分析的 Git 版本；
-2. 沿真实运行路径取证，而不是把所有文件列出来；
-3. 为重要结论引用紧凑的仓库相对路径和源码行号；
+2. 查询已经建立的代码图，只追踪与读者目标有关的运行路径；
+3. 只为进入最终地图的结论和有歧义的重要关系读取、引用紧凑源码范围；
 4. 只有仓库中存在真实 Prompt 或组装逻辑时才生成 Prompt 卡片；
 5. 校验 Schema、引用、拓扑、入口、输出、孤立节点和连续主路径；
 6. 校验失败时最多执行两轮由诊断驱动的局部修复；
@@ -180,7 +192,7 @@ Windows 路径包含空格时必须加引号。
 
 ## 隐私与限制
 
-- 源码阅读和内容判断由用户已有的 Agent 完成；
+- 仓库索引由代码智能工具完成，选定源码的核验与内容判断由用户已有的 Agent 完成；
 - 内置 validator 和 renderer 不调用 LLM 或外部服务；
 - HTML 和 IR 可能暴露仓库路径、系统行为与 Prompt 摘录，公开发布前应先审查；
 - 结果是针对主要行为的有限解释，不保证穷举所有运行路径；
@@ -194,6 +206,7 @@ codebase-system-map/
   SKILL.md                         Agent 工作流
   agents/openai.yaml               Skill 元数据与默认请求
   references/                      展示、证据、建模、交付契约
+                                   以及代码智能工具接口契约
   schemas/system-map.schema.json   System Map IR 2.0
   scripts/system-map.mjs           doctor、validate、deliver
   assets/                          离线图形渲染资源与许可证
@@ -224,6 +237,7 @@ npm test
 
 | 组件 | 用途 | 许可证 |
 | --- | --- | --- |
+| [Codebase Memory](https://github.com/DeusData/codebase-memory-mcp) | 参考代码智能工具，负责索引、架构分析、搜索、路径追踪和源码片段 | MIT |
 | [Viz.js 3.29.0](https://github.com/mdaines/viz-js) | 每份 HTML 内嵌的 JavaScript 封装与 WebAssembly 图形渲染器 | MIT |
 | [Graphviz](https://graphviz.org/) | 在 Viz.js WebAssembly 中完成 DOT 布局并生成 SVG | Eclipse Public License 2.0 |
 | [Expat](https://github.com/libexpat/libexpat) | 由 Viz.js 对象代码间接包含的 XML 解析器 | MIT |

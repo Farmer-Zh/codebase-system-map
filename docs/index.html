@@ -50,12 +50,12 @@
         <div>
           <div class="eyebrow">Open-source Agent Skill</div>
           <h1>See the system inside the code.</h1>
-          <p class="hero-copy">Give your coding agent a repository and describe who needs to understand it. Get one clear, evidence-backed HTML map shaped for that reader—not another exhaustive call graph.</p>
+          <p class="hero-copy">A code-intelligence provider indexes the whole repository. Your coding agent then selects and explains the paths that matter to the reader, producing one clear, evidence-backed HTML map.</p>
           <div class="actions">
             <a class="button primary" href="showcases/full-stack-fastapi-template.html">Open a product map <span aria-hidden="true">→</span></a>
             <a class="button" href="#install">Install the Skill</a>
           </div>
-          <p class="hero-note">Local generation · standalone HTML · no server · no second LLM configuration</p>
+          <p class="hero-note">Local code index · selective Agent synthesis · standalone HTML</p>
         </div>
 
         <div class="map-window" aria-label="Illustration of a repository transformed into an understandable system map">
@@ -132,7 +132,7 @@
     <section class="section" id="install">
       <div class="wrap">
         <div class="install-panel">
-          <div><div class="eyebrow">No API configuration</div><h2>Use the agent you already have.</h2><p>Clone once, copy the Skill into your local skills directory, then start a new agent session. Node.js 18+ is the only runtime requirement.</p><p><a href="https://github.com/Farmer-Zh/codebase-system-map#quick-start">Read the full guide →</a></p></div>
+          <div><div class="eyebrow">Two specialized layers</div><h2>Index first. Explain second.</h2><p>Install the Codebase Memory repository-intelligence provider, then copy this Skill into your local skills directory. The provider handles exhaustive structural indexing; your agent handles reader-shaped synthesis.</p><p><a href="https://github.com/DeusData/codebase-memory-mcp">Install Codebase Memory ↗</a><br><a href="https://github.com/Farmer-Zh/codebase-system-map#quick-start">Read the full guide →</a></p></div>
           <div class="code-box" data-code-tabs>
             <div class="code-tabs" role="tablist" aria-label="Install commands"><button class="active" data-tab="windows" role="tab">Windows</button><button data-tab="unix" role="tab">macOS / Linux</button></div>
             <div class="code-pane active" data-pane="windows"><button class="copy-button" data-copy data-copied="Copied" data-failed="Select text">Copy</button><pre><code>git clone https://github.com/Farmer-Zh/codebase-system-map.git
@@ -154,14 +154,15 @@ cp -R codebase-system-map/. "$HOME/.codex/skills/codebase-system-map/"</code></p
         <div class="section-heading">
           <div class="eyebrow">Open-source building blocks</div>
           <h2>Small by design. Explicit about what it uses.</h2>
-          <p>The Skill’s validator and delivery CLI use only Node.js built-ins. These components are bundled into each standalone HTML so diagrams work without a server or network connection.</p>
+          <p>Codebase Memory supplies detailed repository intelligence. Node.js validates and delivers the map; Viz.js, Graphviz, and Expat render its diagrams inside the standalone HTML.</p>
         </div>
         <div class="library-grid">
+          <article class="library-card"><span class="license">MIT</span><h3>Codebase Memory</h3><p>The reference code-intelligence provider for repository indexing, architecture, search, path tracing, and bounded source retrieval.</p></article>
           <article class="library-card"><span class="license">MIT</span><h3>Viz.js 3.29.0</h3><p>The JavaScript wrapper and WebAssembly graph renderer embedded in every generated document.</p></article>
           <article class="library-card"><span class="license">EPL-2.0</span><h3>Graphviz</h3><p>The DOT layout engine compiled into Viz.js WebAssembly, producing the diagrams’ SVG geometry.</p></article>
           <article class="library-card"><span class="license">MIT</span><h3>Expat</h3><p>An XML parser included transitively in the Viz.js object-code distribution.</p></article>
         </div>
-        <p class="plain-note">The website is implemented in plain HTML, CSS, and JavaScript. See the <a href="https://github.com/Farmer-Zh/codebase-system-map/blob/main/THIRD_PARTY_NOTICES.md">complete third-party notices and license texts</a>.</p>
+        <p class="plain-note">Codebase Memory is installed separately and accessed through its Agent Skill or MCP interface. The website is implemented in plain HTML, CSS, and JavaScript. See the <a href="https://github.com/Farmer-Zh/codebase-system-map/blob/main/THIRD_PARTY_NOTICES.md">complete third-party notices and license texts</a>.</p>
       </div>
     </section>
 

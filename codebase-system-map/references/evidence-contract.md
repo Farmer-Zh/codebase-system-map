@@ -9,11 +9,11 @@ Read this reference while investigating the target repository. Its purpose is to
 - Exclude `.git`, dependencies, vendored code, caches, generated output, build artifacts, coverage output, and historical fixtures unless current runtime evidence proves they participate in the product path.
 - Do not include secrets, credentials, private paths outside the repository, or environment values in the IR.
 
-## Bounded investigation
+## Structural discovery and bounded verification
 
-Use the presentation brief to decide where evidence depth is valuable. A request to emphasize prompts warrants following prompt assembly and the decisions those prompts influence; a request to simplify persistence does not warrant cataloguing every repository call. This changes investigation priority, never the requirement that displayed claims remain traceable.
+Use the code-intelligence provider described in `code-intelligence-contract.md` to discover repository structure, candidate flows, symbols, and relationships. Its index may cover the complete repository without consuming model context. Use the presentation brief to decide which of those results deserve source verification and inclusion. A request to emphasize prompts warrants following prompt assembly and the decisions those prompts influence; a request to simplify persistence does not warrant retrieving every repository call. This changes investigation priority, never the requirement that displayed claims remain traceable.
 
-Start with high-signal material:
+Use provider architecture and search results to locate high-signal material:
 
 - README, context, architecture, operations, and deployment documentation;
 - manifests, workspace configuration, and executable commands;
@@ -22,22 +22,22 @@ Start with high-signal material:
 - LLM calls, prompt assembly, tools, and guardrails when they are part of actual behavior;
 - implementation links from each important entry to its outcome.
 
-Follow runtime paths until the major responsibilities, branches, joins, asynchronous handoffs, state changes, and outputs can be explained. Do not traverse every file merely for completeness. Use tests as corroboration or to clarify branches, not as the sole evidence for production behavior unless the repository itself is a testing product.
+Trace runtime paths through the provider until the major responsibilities, branches, joins, asynchronous handoffs, state changes, and outputs can be explained. Retrieve only the selected source slices and ambiguous areas; do not traverse every file in model context. Use tests as corroboration or to clarify branches, not as the sole evidence for production behavior unless the repository itself is a testing product.
 
-Stop expanding when new files only add implementation detail to an already supported stage. Re-open investigation only when validation identifies a specific missing fact or broken relation.
+Stop expanding when new query results only add implementation detail to an already supported stage. Re-open investigation only when validation identifies a specific missing fact or broken relation.
 
 ## What counts as evidence
 
 Create entries in the IR's centralized `sources` table. Each source must identify an existing repository-relative file and a valid, tight line range. Use the schema's supported `evidence_kind` values; do not invent new enum values.
 
-Evidence must directly support the attached claim:
+Provider graph results identify candidate claims. Source slices must directly support every attached claim that enters the final map:
 
 - a module source supports its responsibility or boundary;
 - a node source supports that stage's behavior, inputs, or outputs;
 - an edge source supports the handoff, call, event, data flow, or transition;
 - a prompt source points to the real prompt text or its assembly logic.
 
-Documentation may explain intent, but executable behavior should be corroborated by code or configuration when available. A filename, symbol name, folder name, or dependency declaration alone does not prove runtime behavior.
+Documentation may explain intent, but executable behavior should be corroborated by code or configuration when available. A cluster, graph edge, filename, symbol name, folder name, or dependency declaration alone does not prove product semantics.
 
 Reuse one source entry from several claims when the same range genuinely supports them. Prefer several narrow ranges over one entire-file citation. Never fabricate line numbers or cite a range that was not inspected.
 

@@ -34,7 +34,7 @@ test('GitHub Pages local assets and links resolve', () => {
 test('both landing pages disclose bundled open-source components', () => {
   for (const file of pageFiles) {
     const html = readFileSync(file, 'utf8');
-    for (const component of ['Viz.js 3.29.0', 'Graphviz', 'Expat']) {
+    for (const component of ['Codebase Memory', 'Viz.js 3.29.0', 'Graphviz', 'Expat']) {
       assert.match(html, new RegExp(component.replace('.', '\\.')));
     }
     assert.match(html, /canonical/);
@@ -64,7 +64,7 @@ test('README files and third-party notices match shipped licenses', () => {
 
   for (const readme of ['README.md', 'README.zh-CN.md']) {
     const text = readFileSync(resolve(root, readme), 'utf8');
-    ['Viz.js 3.29.0', 'Graphviz', 'Expat', 'THIRD_PARTY_NOTICES.md']
+    ['Codebase Memory', 'Viz.js 3.29.0', 'Graphviz', 'Expat', 'THIRD_PARTY_NOTICES.md']
       .forEach((term) => assert.match(text, new RegExp(term.replace('.', '\\.'))));
   }
 });

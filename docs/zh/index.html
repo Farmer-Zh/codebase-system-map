@@ -48,9 +48,9 @@
         <div>
           <div class="eyebrow">开源 Agent Skill</div>
           <h1>看见代码背后的系统。</h1>
-          <p class="hero-copy">把代码库交给你已有的 Coding Agent，再说明谁需要理解它。得到一份按照读者需求组织、每个结论都有源码证据的 HTML 系统地图，而不是一张穷举所有调用的复杂大图。</p>
+          <p class="hero-copy">代码智能工具先为整个仓库建立索引，Coding Agent 再选择并解释与读者有关的路径，最终得到一份清晰且有源码证据的 HTML 系统地图。</p>
           <div class="actions"><a class="button primary" href="../showcases/full-stack-fastapi-template.html">打开产品视角案例 <span aria-hidden="true">→</span></a><a class="button" href="#install">安装 Skill</a></div>
-          <p class="hero-note">本地生成 · 单文件 HTML · 不启动服务器 · 不配置第二套 LLM</p>
+          <p class="hero-note">本地代码索引 · Agent 选择性整理 · 单文件 HTML</p>
         </div>
         <div class="map-window" aria-label="代码库被转化为清晰系统地图的示意图">
           <div class="map-toolbar"><span>system-map.html</span><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
@@ -104,7 +104,7 @@
 
     <section class="section" id="install">
       <div class="wrap"><div class="install-panel">
-        <div><div class="eyebrow">不需要 API 配置</div><h2>直接使用你已有的 Agent。</h2><p>克隆一次，把 Skill 复制到本地 skills 目录，再打开新的 Agent 会话。唯一运行要求是 Node.js 18 或更高版本。</p><p><a href="https://github.com/Farmer-Zh/codebase-system-map/blob/main/README.zh-CN.md#快速开始">阅读完整指南 →</a></p></div>
+        <div><div class="eyebrow">两个专用层</div><h2>先索引，再解释。</h2><p>先安装 Codebase Memory 代码智能工具，再把本 Skill 复制到本地 skills 目录。前者负责完整结构索引，已有 Agent 负责按照读者目标整理内容。</p><p><a href="https://github.com/DeusData/codebase-memory-mcp">安装 Codebase Memory ↗</a><br><a href="https://github.com/Farmer-Zh/codebase-system-map/blob/main/README.zh-CN.md#快速开始">阅读完整指南 →</a></p></div>
         <div class="code-box" data-code-tabs><div class="code-tabs" role="tablist" aria-label="安装命令"><button class="active" data-tab="windows" role="tab">Windows</button><button data-tab="unix" role="tab">macOS / Linux</button></div>
           <div class="code-pane active" data-pane="windows"><button class="copy-button" data-copy data-copied="已复制" data-failed="请选中文字">复制</button><pre><code>git clone https://github.com/Farmer-Zh/codebase-system-map.git
 cd codebase-system-map
@@ -121,13 +121,14 @@ cp -R codebase-system-map/. "$HOME/.codex/skills/codebase-system-map/"</code></p
 
     <section class="section white" id="libraries">
       <div class="wrap">
-        <div class="section-heading"><div class="eyebrow">使用的开源组件</div><h2>结构尽量小，依赖必须说清楚。</h2><p>Skill 的校验器和交付 CLI 只使用 Node.js 内置模块。为了让图形不依赖服务器和网络，每份独立 HTML 会内嵌以下组件。</p></div>
+        <div class="section-heading"><div class="eyebrow">使用的开源组件</div><h2>结构尽量小，依赖必须说清楚。</h2><p>Codebase Memory 提供详细的仓库智能信息；Node.js 校验并交付地图；Viz.js、Graphviz 和 Expat 在独立 HTML 内渲染图形。</p></div>
         <div class="library-grid">
+          <article class="library-card"><span class="license">MIT</span><h3>Codebase Memory</h3><p>参考代码智能工具，负责仓库索引、架构分析、搜索、路径追踪和有范围限制的源码读取。</p></article>
           <article class="library-card"><span class="license">MIT</span><h3>Viz.js 3.29.0</h3><p>每份生成文档内嵌的 JavaScript 封装和 WebAssembly 图形渲染器。</p></article>
           <article class="library-card"><span class="license">EPL-2.0</span><h3>Graphviz</h3><p>编译进 Viz.js WebAssembly 的 DOT 布局引擎，负责生成图形的 SVG 几何结构。</p></article>
           <article class="library-card"><span class="license">MIT</span><h3>Expat</h3><p>由 Viz.js 对象代码间接包含的 XML 解析器。</p></article>
         </div>
-        <p class="plain-note">网站使用原生 HTML、CSS 和 JavaScript 实现。查看<a href="https://github.com/Farmer-Zh/codebase-system-map/blob/main/THIRD_PARTY_NOTICES.md">完整第三方说明和许可证文本</a>。</p>
+        <p class="plain-note">Codebase Memory 单独安装，通过它的 Agent Skill 或 MCP 接口使用。网站使用原生 HTML、CSS 和 JavaScript 实现。查看<a href="https://github.com/Farmer-Zh/codebase-system-map/blob/main/THIRD_PARTY_NOTICES.md">完整第三方说明和许可证文本</a>。</p>
       </div>
     </section>
 

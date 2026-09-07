@@ -5,10 +5,11 @@
 [Website & live showcases](https://farmer-zh.github.io/codebase-system-map/) · [简体中文](README.zh-CN.md)
 
 Codebase System Map is an open-source Agent Skill for codebase visualization,
-software architecture documentation, and developer onboarding. It guides a
-repository-aware coding agent to turn real source behavior into one standalone
-HTML document that product managers, founders, operators, and engineers can
-read.
+software architecture documentation, and developer onboarding. A dedicated
+code-intelligence provider indexes the repository and returns detailed
+architecture and execution paths; the coding agent then turns those facts into
+one standalone HTML document that product managers, founders, operators, and
+engineers can read.
 
 - **Audience-shaped:** tell the agent who will read the map and what matters.
 - **Conversational:** refine modules, detail, terminology, and emphasis in
@@ -20,7 +21,8 @@ read.
 
 ~~~text
 Repository
-  → agent follows important runtime paths
+  → code-intelligence provider indexes symbols and relationships
+  → agent selects and explains the relevant runtime paths
   → evidence-backed System Map IR
   → local validation
   → standalone system-map.html
@@ -65,20 +67,32 @@ recorded beside each example in metadata.json.
 ### Requirements
 
 - A coding agent that can inspect the target repository and run local commands.
+- A repository-intelligence Skill or MCP provider. The documented reference
+  integration is [Codebase Memory](https://github.com/DeusData/codebase-memory-mcp).
 - Node.js 18 or newer.
 - Git is optional, but recommended so the map can record the analyzed revision.
 
 The bundled validator and renderer have no package-install step and make no
 network requests.
 
-### 1. Clone
+### 1. Install a code-intelligence provider
+
+Install [Codebase Memory](https://github.com/DeusData/codebase-memory-mcp) using
+its platform guide, then restart the coding agent. It indexes the repository
+into a persistent local knowledge graph and exposes bounded architecture,
+search, trace, and source-snippet operations to the Agent Skill.
+
+Another repository-intelligence Skill may be used when it provides those same
+four capabilities.
+
+### 2. Clone
 
 ~~~bash
 git clone https://github.com/Farmer-Zh/codebase-system-map.git
 cd codebase-system-map
 ~~~
 
-### 2. Install the Skill
+### 3. Install the Skill
 
 For a local Codex installation on Windows PowerShell:
 
@@ -102,7 +116,7 @@ For another Agent Skills-compatible coding agent, install the
 codebase-system-map directory using that product's Skill discovery mechanism.
 The entry point is [SKILL.md](codebase-system-map/SKILL.md).
 
-### 3. Ask for the map you need
+### 4. Ask for the map you need
 
 For product understanding:
 
@@ -175,8 +189,9 @@ all document content remains inside the file.
 The Skill requires the agent to:
 
 1. establish the repository boundary and analyzed Git revision;
-2. follow real runtime paths instead of cataloguing every file;
-3. cite tight repository-relative source ranges for important claims;
+2. query an indexed architecture and trace only reader-relevant runtime paths;
+3. retrieve and cite tight repository-relative source ranges only for selected
+   claims and ambiguous high-value relations;
 4. create prompts only when real prompt text or assembly logic exists;
 5. validate schema, references, topology, entry/output nodes, and the primary
    path;
@@ -201,7 +216,8 @@ Quote Windows paths that contain spaces.
 
 ## Privacy and limitations
 
-- Source inspection and final rendering happen locally through the host agent.
+- Repository indexing, selected source inspection, and final rendering happen
+  locally through the code-intelligence provider and host agent.
 - The bundled validator and renderer do not call an LLM or external service.
 - Generated HTML and IR may expose repository paths, system behavior, and
   prompt excerpts. Review them before publishing or sharing outside your team.
@@ -219,6 +235,7 @@ codebase-system-map/
   SKILL.md                         agent workflow
   agents/openai.yaml               Skill metadata and default request
   references/                      presentation, evidence, authoring, delivery
+                                   and code-intelligence provider contract
   schemas/system-map.schema.json   System Map IR 2.0
   scripts/system-map.mjs           doctor, validate, deliver
   assets/                          offline graph renderer and license
@@ -250,6 +267,7 @@ so diagrams continue to work offline:
 
 | Component | How it is used | License |
 | --- | --- | --- |
+| [Codebase Memory](https://github.com/DeusData/codebase-memory-mcp) | Reference repository-intelligence provider for indexing, architecture, search, path tracing, and source slices | MIT |
 | [Viz.js 3.29.0](https://github.com/mdaines/viz-js) | JavaScript wrapper and WebAssembly graph renderer embedded in every HTML file | MIT |
 | [Graphviz](https://graphviz.org/) | DOT layout and SVG generation inside the Viz.js WebAssembly build | Eclipse Public License 2.0 |
 | [Expat](https://github.com/libexpat/libexpat) | XML parser included transitively in the Viz.js object-code distribution | MIT |
