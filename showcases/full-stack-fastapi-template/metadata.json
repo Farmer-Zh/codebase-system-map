@@ -1,0 +1,45 @@
+{
+  "repository": "fastapi/full-stack-fastapi-template",
+  "repository_url": "https://github.com/fastapi/full-stack-fastapi-template",
+  "analyzed_revision": "cb740b656d7a0a6c5e12c7bf8e50343ec94ee9c7",
+  "license": "MIT",
+  "language": "en",
+  "presentation": {
+    "audience": "product",
+    "detail_level": "standard",
+    "focus": [
+      "capabilities",
+      "state",
+      "interfaces"
+    ],
+    "reader_goal": "See the user journey from account access to managing owned items, including the product-visible security and recovery decisions without needing to understand framework plumbing.",
+    "priorities": [
+      "sign-up and sign-in journey",
+      "authenticated item workflow",
+      "account recovery",
+      "frontend-to-backend boundary",
+      "user-visible outcomes"
+    ],
+    "deemphasize": [
+      "container and deployment setup",
+      "generated API client internals",
+      "migration mechanics",
+      "ordinary database session plumbing"
+    ]
+  },
+  "generator": "codebase-system-map skill IR 2.0",
+  "authoring_method": "configured OpenAI-compatible API",
+  "generated_at": "2026-09-06T11:47:38.244Z",
+  "counts": {
+    "modules": 5,
+    "nodes": 16,
+    "edges": 26,
+    "sources": 52,
+    "prompts": 0
+  },
+  "validation": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "html_bytes": 1643224
+}

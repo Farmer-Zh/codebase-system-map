@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Codebase System Map — 把代码库变成可读的系统地图</title>
+  <meta name="description" content="开源 Agent Skill：把代码仓库转化为有源码证据、按照读者需求组织、可以离线分享的单文件 HTML 系统地图。">
+  <meta name="keywords" content="代码库可视化, 软件架构图, 代码地图, 系统架构文档, 开发者上手, Agent Skill, 独立 HTML">
+  <meta name="theme-color" content="#f7f7f5">
+  <link rel="canonical" href="https://farmer-zh.github.io/codebase-system-map/zh/">
+  <link rel="alternate" hreflang="en" href="https://farmer-zh.github.io/codebase-system-map/">
+  <link rel="alternate" hreflang="zh-CN" href="https://farmer-zh.github.io/codebase-system-map/zh/">
+  <link rel="alternate" hreflang="x-default" href="https://farmer-zh.github.io/codebase-system-map/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Codebase System Map">
+  <meta property="og:description" content="给 Coding Agent 一个仓库，得到一份产品人员也能读懂、有源码证据的系统地图。">
+  <meta property="og:url" content="https://farmer-zh.github.io/codebase-system-map/zh/">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Codebase System Map",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Windows, macOS, Linux",
+    "description": "把代码仓库转化为有源码证据、可离线分享的 HTML 系统地图的开源 Agent Skill。",
+    "url": "https://farmer-zh.github.io/codebase-system-map/zh/",
+    "codeRepository": "https://github.com/Farmer-Zh/codebase-system-map",
+    "license": "https://opensource.org/license/mit"
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav" aria-label="主导航">
+      <a class="brand" href="#top"><span class="brand-mark">MAP</span> Codebase System Map</a>
+      <div class="nav-links">
+        <a href="#how">如何工作</a><a href="#showcases">案例</a><a href="#install">安装</a>
+        <a class="github-link" href="https://github.com/Farmer-Zh/codebase-system-map">GitHub ↗</a>
+        <a class="language-link" href="../" lang="en">English</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="eyebrow">开源 Agent Skill</div>
+          <h1>看见代码背后的系统。</h1>
+          <p class="hero-copy">把代码库交给你已有的 Coding Agent，再说明谁需要理解它。得到一份按照读者需求组织、每个结论都有源码证据的 HTML 系统地图，而不是一张穷举所有调用的复杂大图。</p>
+          <div class="actions"><a class="button primary" href="../showcases/full-stack-fastapi-template.html">打开产品视角案例 <span aria-hidden="true">→</span></a><a class="button" href="#install">安装 Skill</a></div>
+          <p class="hero-note">本地生成 · 单文件 HTML · 不启动服务器 · 不配置第二套 LLM</p>
+        </div>
+        <div class="map-window" aria-label="代码库被转化为清晰系统地图的示意图">
+          <div class="map-toolbar"><span>system-map.html</span><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+          <div class="map-canvas">
+            <div class="map-title"><strong>账号与内容体验</strong><span>产品视角 · 标准颗粒度</span></div>
+            <i class="flow-line line-a"></i><i class="flow-line line-b"></i><i class="flow-line line-c"></i><i class="flow-line line-d"></i><i class="flow-line line-e"></i>
+            <div class="map-node node-a"><b>账号入口</b><small>注册、登录与找回</small><em>入口</em></div>
+            <div class="map-node node-b"><b>身份校验</b><small>保护用户私有操作</small><em>判断</em></div>
+            <div class="map-node node-c"><b>自有内容</b><small>创建并管理用户内容</small><em>能力</em></div>
+            <div class="map-node node-d"><b>账号恢复</b><small>重新回到可用状态</small><em>流程</em></div>
+            <div class="map-node node-e"><b>用户结果</b><small>安全且可见的反馈</small><em>输出</em></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section white" id="how">
+      <div class="wrap">
+        <div class="section-heading"><div class="eyebrow">从代码仓库到系统说明</div><h2>三个层级，一条清楚的阅读路径。</h2><p>先理解系统全貌，再按需进入模块和节点。读者只需要看到真正有助于理解产品或实现的细节。</p></div>
+        <figure class="workflow-figure"><img src="../assets/workflow.gif" alt="从确定读者到打开独立代码库系统地图的动态演示" width="1120" height="700" loading="lazy"><figcaption>说明读者 → 沿源码取证 → 分享一份离线 HTML。</figcaption></figure>
+        <div class="three-up">
+          <article class="feature"><div class="step">01</div><div><h3>系统总览</h3><p>仓库实现什么能力、承担哪些主要职责，以及一条完整的核心路径。</p></div></article>
+          <article class="feature"><div class="step">02</div><div><h3>模块视图</h3><p>有业务或运行意义的边界、关系、判断和结果，并使用读者熟悉的语言。</p></div></article>
+          <article class="feature"><div class="step">03</div><div><h3>节点证据</h3><p>职责、输入、输出、准确源码位置，以及仓库确实包含 LLM 时的真实 Prompt。</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="conversation">
+      <div class="wrap conversation">
+        <div class="conversation-copy"><div class="eyebrow">读者决定地图</div><h2>直接告诉 Agent 你想理解什么。</h2><p>产品和技术不是两个僵硬模板。Agent 会把自然语言变成实际的模块边界、颗粒度、名称、Prompt、关系与折叠层级。</p></div>
+        <div class="chat-stack" aria-label="与 Coding Agent 对话的例子">
+          <div class="chat user"><div class="chat-label">你</div><p>给产品经理看。重点解释每个模块做什么、用户能看到什么，以及真实 Prompt；框架和数据库管线尽量合并。</p></div>
+          <div class="chat agent"><div class="chat-label">Agent 设计地图</div><p>我会优先展示能力和用户旅程，合并普通基础设施，并把源码证据保留在每个节点的详情中。</p></div>
+          <div class="chat user"><div class="chat-label">你 · 看到第一版后</div><p>支付失败恢复再细一点。展示两个 Prompt 分别怎样改变最后回复，但普通 API 接线不用展开。</p></div>
+          <div class="chat agent"><div class="chat-label">Agent 修改模型</div><p>我会拆分该模块、增加 Prompt 影响关系、保留证据，重新校验完整路径，并只在交付成功后替换 HTML。</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section white" id="showcases">
+      <div class="wrap">
+        <div class="section-heading"><div class="eyebrow">由公开代码库生成</div><h2>三类读者，三种不同的地图。</h2><p>每个案例都固定了公开 commit，并包含可继续修订的 JSON IR。下载 HTML 后仍可完全离线使用。</p></div>
+        <div class="case-grid">
+          <article class="case"><div class="case-top"><div class="case-kicker">产品地图 · 5 个模块</div><div class="mini-flow"><span>账号</span><i></i><span>身份</span><i></i><span>内容</span></div></div><div class="case-body"><h3>Full Stack FastAPI Template</h3><p>注册、登录、账号恢复和用户自有内容，不要求读者理解容器、迁移和生成客户端内部细节。</p><div class="case-meta"><span class="tag">产品视角</span><span class="tag">16 节点</span><span class="tag">52 条证据</span></div><div class="case-links"><a href="../showcases/full-stack-fastapi-template.html">打开 HTML →</a><a href="https://github.com/fastapi/full-stack-fastapi-template">查看源码 ↗</a></div></div></article>
+          <article class="case"><div class="case-top"><div class="case-kicker">技术地图 · 8 个模块</div><div class="mini-flow"><span>声明</span><i></i><span>队列</span><i></i><span>Worker</span></div></div><div class="case-body"><h3>Huey</h3><p>任务怎样进入队列，Worker 与调度器如何配合，以及重试、失败和结果如何在系统中流动。</p><div class="case-meta"><span class="tag">技术视角</span><span class="tag">21 节点</span><span class="tag">61 条证据</span></div><div class="case-links"><a href="../showcases/huey.html">打开 HTML →</a><a href="https://github.com/coleifer/huey">查看源码 ↗</a></div></div></article>
+          <article class="case"><div class="case-top"><div class="case-kicker">混合视角 · 真实 Prompt</div><div class="mini-flow"><span>运行</span><i></i><span>工具 / Handoff</span><i></i><span>Guardrail</span></div></div><div class="case-body"><h3>OpenAI Agents SDK</h3><p>为跨职能读者解释运行循环、工具、Handoff、Guardrail、Session、Tracing 和一个真实 Prompt。</p><div class="case-meta"><span class="tag">混合视角</span><span class="tag">13 节点</span><span class="tag">1 个 PROMPT</span></div><div class="case-links"><a href="../showcases/openai-agents-python.html">打开 HTML →</a><a href="https://github.com/openai/openai-agents-python">查看源码 ↗</a></div></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="install">
+      <div class="wrap"><div class="install-panel">
+        <div><div class="eyebrow">不需要 API 配置</div><h2>直接使用你已有的 Agent。</h2><p>克隆一次，把 Skill 复制到本地 skills 目录，再打开新的 Agent 会话。唯一运行要求是 Node.js 18 或更高版本。</p><p><a href="https://github.com/Farmer-Zh/codebase-system-map/blob/main/README.zh-CN.md#快速开始">阅读完整指南 →</a></p></div>
+        <div class="code-box" data-code-tabs><div class="code-tabs" role="tablist" aria-label="安装命令"><button class="active" data-tab="windows" role="tab">Windows</button><button data-tab="unix" role="tab">macOS / Linux</button></div>
+          <div class="code-pane active" data-pane="windows"><button class="copy-button" data-copy data-copied="已复制" data-failed="请选中文字">复制</button><pre><code>git clone https://github.com/Farmer-Zh/codebase-system-map.git
+cd codebase-system-map
+$skillPath = Join-Path $env:USERPROFILE ".codex\skills\codebase-system-map"
+New-Item -ItemType Directory -Force $skillPath | Out-Null
+Copy-Item ".\codebase-system-map\*" $skillPath -Recurse -Force</code></pre></div>
+          <div class="code-pane" data-pane="unix"><button class="copy-button" data-copy data-copied="已复制" data-failed="请选中文字">复制</button><pre><code>git clone https://github.com/Farmer-Zh/codebase-system-map.git
+cd codebase-system-map
+mkdir -p "$HOME/.codex/skills/codebase-system-map"
+cp -R codebase-system-map/. "$HOME/.codex/skills/codebase-system-map/"</code></pre></div>
+        </div>
+      </div></div>
+    </section>
+
+    <section class="section white" id="libraries">
+      <div class="wrap">
+        <div class="section-heading"><div class="eyebrow">使用的开源组件</div><h2>结构尽量小，依赖必须说清楚。</h2><p>Skill 的校验器和交付 CLI 只使用 Node.js 内置模块。为了让图形不依赖服务器和网络，每份独立 HTML 会内嵌以下组件。</p></div>
+        <div class="library-grid">
+          <article class="library-card"><span class="license">MIT</span><h3>Viz.js 3.29.0</h3><p>每份生成文档内嵌的 JavaScript 封装和 WebAssembly 图形渲染器。</p></article>
+          <article class="library-card"><span class="license">EPL-2.0</span><h3>Graphviz</h3><p>编译进 Viz.js WebAssembly 的 DOT 布局引擎，负责生成图形的 SVG 几何结构。</p></article>
+          <article class="library-card"><span class="license">MIT</span><h3>Expat</h3><p>由 Viz.js 对象代码间接包含的 XML 解析器。</p></article>
+        </div>
+        <p class="plain-note">网站本身只使用原生 HTML、CSS 和 JavaScript，不使用框架、远程字体、CDN 或统计脚本。三个案例仓库只是分析对象，不是项目依赖。查看<a href="https://github.com/Farmer-Zh/codebase-system-map/blob/main/THIRD_PARTY_NOTICES.md">完整第三方说明</a>。</p>
+      </div>
+    </section>
+
+    <section class="closing"><div class="wrap"><div class="eyebrow">地图来自对话</div><h2>让决定下一步的人真正读懂代码库。</h2><p>免费开源、MIT 许可证、跨平台，并且最终只留下一个可以直接分享的文件。</p><div class="actions"><a class="button primary" href="https://github.com/Farmer-Zh/codebase-system-map">在 GitHub 查看 <span aria-hidden="true">↗</span></a><a class="button" href="../showcases/openai-agents-python.html">查看包含 Prompt 的案例</a></div></div></section>
+  </main>
+
+  <footer class="site-footer"><div class="wrap footer-row"><span>Codebase System Map · MIT · 2026</span><div class="footer-links"><a href="https://github.com/Farmer-Zh/codebase-system-map/blob/main/README.zh-CN.md">使用文档</a><a href="https://github.com/Farmer-Zh/codebase-system-map/blob/main/THIRD_PARTY_NOTICES.md">第三方说明</a><a href="https://github.com/Farmer-Zh/codebase-system-map/issues">问题反馈</a></div></div></footer>
+  <script src="../assets/site.js"></script>
+</body>
+</html>

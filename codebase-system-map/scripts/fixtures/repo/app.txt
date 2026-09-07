@@ -1,0 +1,4 @@
+receive request
+assemble prompt and ask model
+shape the result
+write standalone document

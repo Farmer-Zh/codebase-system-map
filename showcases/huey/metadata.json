@@ -1,0 +1,44 @@
+{
+  "repository": "coleifer/huey",
+  "repository_url": "https://github.com/coleifer/huey",
+  "analyzed_revision": "6e8acd022346eeb1b09f46c7fa2612f760ee194b",
+  "license": "MIT",
+  "language": "en",
+  "presentation": {
+    "audience": "technical",
+    "detail_level": "deep",
+    "focus": [
+      "runtime-flow",
+      "state",
+      "interfaces",
+      "source-evidence"
+    ],
+    "reader_goal": "Understand how a declared task becomes queued work, how workers and the scheduler coordinate execution, and how results, retries, and failures travel through the system.",
+    "priorities": [
+      "task lifecycle",
+      "worker and scheduler responsibilities",
+      "queue and result state",
+      "retry and failure paths"
+    ],
+    "deemphasize": [
+      "individual storage backend implementations",
+      "framework integration examples",
+      "administrative commands"
+    ]
+  },
+  "generator": "codebase-system-map skill IR 2.0",
+  "authoring_method": "configured OpenAI-compatible API",
+  "generated_at": "2026-09-06T11:34:48.658Z",
+  "counts": {
+    "modules": 8,
+    "nodes": 21,
+    "edges": 26,
+    "sources": 61,
+    "prompts": 0
+  },
+  "validation": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "html_bytes": 1666229
+}

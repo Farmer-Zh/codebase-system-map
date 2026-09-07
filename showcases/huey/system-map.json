@@ -1,0 +1,1259 @@
+{
+  "meta": {
+    "schema_version": "2.0",
+    "repository": "coleifer/huey",
+    "analyzed_revision": "6e8acd022346eeb1b09f46c7fa2612f760ee194b",
+    "language": "en",
+    "presentation": {
+      "audience": "technical",
+      "detail_level": "deep",
+      "focus": [
+        "runtime-flow",
+        "state",
+        "interfaces",
+        "source-evidence"
+      ],
+      "reader_goal": "Understand how a declared task becomes queued work, how workers and the scheduler coordinate execution, and how results, retries, and failures travel through the system.",
+      "priorities": [
+        "task lifecycle",
+        "worker and scheduler responsibilities",
+        "queue and result state",
+        "retry and failure paths"
+      ],
+      "deemphasize": [
+        "individual storage backend implementations",
+        "framework integration examples",
+        "administrative commands"
+      ]
+    }
+  },
+  "system": {
+    "name": "huey",
+    "summary": "huey is a lightweight Python task queue. Decorated functions build serializable Task messages that are stored in a backend queue; a Consumer supervises Worker processes that dequeue and execute tasks and a Scheduler that moves delayed/periodic tasks into the queue. Results are retained in a key/value result store and fetched through Result handles, while the execution layer converts failures into retries or stored errors."
+  },
+  "modules": [
+    {
+      "id": "api",
+      "name": "Task API and enqueue",
+      "responsibility": "Declares tasks through decorators, builds Task objects, serializes and enqueues them, and exposes scheduling helpers and result handles.",
+      "source_refs": [
+        "s006",
+        "s009",
+        "s010",
+        "s012",
+        "s018",
+        "s025",
+        "s027"
+      ]
+    },
+    {
+      "id": "registry",
+      "name": "Task registry, message codec, and serialization",
+      "responsibility": "Registers task classes by qualified name, converts Task objects to/from flat Message tuples, and pickles them with optional compression or HMAC signing.",
+      "source_refs": [
+        "s055",
+        "s057",
+        "s058",
+        "s059",
+        "s060",
+        "s061"
+      ]
+    },
+    {
+      "id": "storage",
+      "name": "Storage backend contract",
+      "responsibility": "Defines the backend APIs for the task queue, the delayed-task schedule, and the key/value result store; concrete backends implement these primitives.",
+      "source_refs": [
+        "s049",
+        "s050",
+        "s051",
+        "s052"
+      ]
+    },
+    {
+      "id": "consumer",
+      "name": "Consumer supervisor",
+      "responsibility": "Creates the execution environment, starts and supervises scheduler and worker processes, and coordinates graceful shutdown.",
+      "source_refs": [
+        "s039",
+        "s040",
+        "s042",
+        "s044",
+        "s047"
+      ]
+    },
+    {
+      "id": "worker",
+      "name": "Worker process",
+      "responsibility": "Polls the queue and hands each dequeued task to the execution engine, backing off when the queue is empty.",
+      "source_refs": [
+        "s034",
+        "s035"
+      ]
+    },
+    {
+      "id": "scheduler",
+      "name": "Scheduler process",
+      "responsibility": "Moves due scheduled tasks from the schedule store into the main queue and enqueues periodic tasks when their crontab matches.",
+      "source_refs": [
+        "s036",
+        "s037"
+      ]
+    },
+    {
+      "id": "execution",
+      "name": "Execution and retry handling",
+      "responsibility": "Runs ready tasks, applies timeout context and pre/post execution hooks, and translates expected exceptions into retry state or failure metadata.",
+      "source_refs": [
+        "s015",
+        "s016",
+        "s017",
+        "s018"
+      ]
+    },
+    {
+      "id": "results",
+      "name": "Result handles",
+      "responsibility": "Wraps task ids so callers can poll or block for stored results, and raises TaskException when a stored Error is retrieved.",
+      "source_refs": [
+        "s029",
+        "s030",
+        "s031"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "task-declare",
+      "module_id": "api",
+      "kind": "entry",
+      "name": "Task declaration",
+      "purpose": "Turns a plain function into a callable TaskWrapper and dynamically creates a Task subclass registered with Huey.",
+      "inputs": [
+        "user function",
+        "decorator options such as retries, retry_delay, priority, timeout, and crontab for periodic tasks"
+      ],
+      "outputs": [
+        "task wrapper",
+        "registered task class"
+      ],
+      "source_refs": [
+        "s009",
+        "s010",
+        "s025"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "invoke-task",
+      "module_id": "api",
+      "kind": "entry",
+      "name": "Task invocation",
+      "purpose": "Calling the TaskWrapper or using .s() constructs a Task with optional eta and immediately enqueues it; .schedule() creates an eta-based Task.",
+      "inputs": [
+        "task wrapper",
+        "call arguments",
+        "schedule/retry/priority/timeout options"
+      ],
+      "outputs": [
+        "Task instance",
+        "call to Huey.enqueue"
+      ],
+      "source_refs": [
+        "s027",
+        "s028"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "enqueue",
+      "module_id": "api",
+      "kind": "stage",
+      "name": "Enqueue",
+      "purpose": "Serializes the task, writes it to the storage queue, emits SIGNAL_ENQUEUED, and returns a Result handle; immediate mode executes synchronously instead.",
+      "inputs": [
+        "Task instance"
+      ],
+      "outputs": [
+        "serialized message bytes",
+        "Result handle",
+        "queue write"
+      ],
+      "source_refs": [
+        "s012"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "schedule-add",
+      "module_id": "api",
+      "kind": "stage",
+      "name": "Add to schedule",
+      "purpose": "Serializes a not-yet-ready task and stores it in the schedule with an eta timestamp.",
+      "inputs": [
+        "Task instance",
+        "eta timestamp"
+      ],
+      "outputs": [
+        "scheduled message in schedule store"
+      ],
+      "source_refs": [
+        "s018"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "task-registry",
+      "module_id": "registry",
+      "kind": "store",
+      "name": "Task registry",
+      "purpose": "Stores task class lookup by module-qualified task name and keeps a list of periodic task classes.",
+      "inputs": [
+        "task class from TaskWrapper"
+      ],
+      "outputs": [
+        "task class for deserialization",
+        "periodic task classes"
+      ],
+      "source_refs": [
+        "s055",
+        "s056"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "message-codec",
+      "module_id": "registry",
+      "kind": "stage",
+      "name": "Task/Message codec",
+      "purpose": "Flattens a Task, including on_complete, on_error, and chord config, into a Message namedtuple and rebuilds a Task from a Message.",
+      "inputs": [
+        "Task instance",
+        "raw Message"
+      ],
+      "outputs": [
+        "Message tuple",
+        "restored Task"
+      ],
+      "source_refs": [
+        "s057",
+        "s058"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "serializer",
+      "module_id": "registry",
+      "kind": "stage",
+      "name": "Serializer",
+      "purpose": "Pickles Message tuples with optional gzip/zlib compression, and verifies HMAC signatures when using SignedSerializer.",
+      "inputs": [
+        "Message tuple",
+        "serialized bytes"
+      ],
+      "outputs": [
+        "serialized bytes",
+        "deserialized Message tuple"
+      ],
+      "source_refs": [
+        "s059",
+        "s060",
+        "s061"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "queue-store",
+      "module_id": "storage",
+      "kind": "store",
+      "name": "Queue store",
+      "purpose": "Backend queue holding serialized task bytes; enqueue appends by priority and dequeue atomically removes the next task.",
+      "inputs": [
+        "serialized message bytes",
+        "dequeue request"
+      ],
+      "outputs": [
+        "serialized message bytes",
+        "queue size"
+      ],
+      "source_refs": [
+        "s049",
+        "s050"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "schedule-store",
+      "module_id": "storage",
+      "kind": "store",
+      "name": "Schedule store",
+      "purpose": "Backend schedule of serialized tasks keyed by eta; read_schedule removes tasks due at or before a timestamp.",
+      "inputs": [
+        "scheduled serialized task",
+        "timestamp"
+      ],
+      "outputs": [
+        "due serialized tasks"
+      ],
+      "source_refs": [
+        "s050",
+        "s051"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "result-store",
+      "module_id": "storage",
+      "kind": "store",
+      "name": "Result store",
+      "purpose": "Backend key/value store for task results, revocation markers, and locks; put_data with is_result=True marks volatile task results.",
+      "inputs": [
+        "task id/result value",
+        "read request"
+      ],
+      "outputs": [
+        "stored result",
+        "retrieved result bytes"
+      ],
+      "source_refs": [
+        "s052"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "consumer-supervisor",
+      "module_id": "consumer",
+      "kind": "stage",
+      "name": "Consumer supervisor",
+      "purpose": "Builds the environment-specific stop flag and timeout handler, starts scheduler and workers, and restarts dead processes via health checks.",
+      "inputs": [
+        "Huey instance",
+        "worker_type",
+        "worker count",
+        "scheduler_interval"
+      ],
+      "outputs": [
+        "running scheduler process",
+        "running worker processes",
+        "stop_flag"
+      ],
+      "source_refs": [
+        "s039",
+        "s040",
+        "s042",
+        "s047"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "worker-dequeue",
+      "module_id": "worker",
+      "kind": "stage",
+      "name": "Worker dequeue loop",
+      "purpose": "Worker loop calls huey.dequeue, which reads from storage.dequeue, and passes each task to huey.execute; sleeps with exponential backoff when the queue is empty.",
+      "inputs": [
+        "queue store read",
+        "stop_flag"
+      ],
+      "outputs": [
+        "Task instance",
+        "call to Huey.execute"
+      ],
+      "source_refs": [
+        "s035"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "scheduler-loop",
+      "module_id": "scheduler",
+      "kind": "stage",
+      "name": "Scheduler loop",
+      "purpose": "Every scheduler_interval, reads due tasks from the schedule and enqueues them; also triggers periodic checks when enabled.",
+      "inputs": [
+        "schedule store read",
+        "interval"
+      ],
+      "outputs": [
+        "due tasks to enqueue",
+        "periodic check trigger"
+      ],
+      "source_refs": [
+        "s036"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "periodic-dispatch",
+      "module_id": "scheduler",
+      "kind": "stage",
+      "name": "Periodic task dispatch",
+      "purpose": "Iterates periodic task classes whose validate_datetime matches the current timestamp and enqueues each as a new task.",
+      "inputs": [
+        "periodic task classes",
+        "timestamp"
+      ],
+      "outputs": [
+        "periodic Task instances to enqueue"
+      ],
+      "source_refs": [
+        "s037"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "execute",
+      "module_id": "execution",
+      "kind": "stage",
+      "name": "Execute entry",
+      "purpose": "Entry point for task execution: checks readiness, revocation, and expiry, then runs _execute; also used for immediate-mode execution.",
+      "inputs": [
+        "Task instance"
+      ],
+      "outputs": [
+        "ready/not-ready decision request",
+        "execution result/exception"
+      ],
+      "source_refs": [
+        "s015"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "ready-decision",
+      "module_id": "execution",
+      "kind": "decision",
+      "name": "Ready check",
+      "purpose": "If task.eta is None or in the past, the task runs now; otherwise the task is added to the schedule for its eta.",
+      "inputs": [
+        "Task instance",
+        "current timestamp"
+      ],
+      "outputs": [
+        "run now",
+        "add to schedule"
+      ],
+      "source_refs": [
+        "s015",
+        "s018"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "run-task",
+      "module_id": "execution",
+      "kind": "stage",
+      "name": "Run task",
+      "purpose": "Executes the wrapped function inside the configured timeout context, tracks in-flight tasks, and measures duration.",
+      "inputs": [
+        "Task instance",
+        "ready decision"
+      ],
+      "outputs": [
+        "return value",
+        "exceptions",
+        "result store write"
+      ],
+      "source_refs": [
+        "s016"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "failure-state",
+      "module_id": "execution",
+      "kind": "stage",
+      "name": "Failure capture",
+      "purpose": "Catches TaskTimeout, RateLimitExceeded, TaskLockedException, RetryTask, CancelExecution, and unhandled exceptions, emits corresponding signals, and records retry_eta when a retry is available.",
+      "inputs": [
+        "exception from run-task"
+      ],
+      "outputs": [
+        "retry_eta",
+        "exception state",
+        "error/retry decision"
+      ],
+      "source_refs": [
+        "s016",
+        "s017"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "retry-schedule",
+      "module_id": "execution",
+      "kind": "stage",
+      "name": "Retry scheduling",
+      "purpose": "Uses the computed retry_eta to place the task back on the schedule for a later attempt while retries remain.",
+      "inputs": [
+        "retry_eta",
+        "Task instance"
+      ],
+      "outputs": [
+        "retry task scheduling request"
+      ],
+      "source_refs": [
+        "s016",
+        "s018"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "result-handle",
+      "module_id": "results",
+      "kind": "artifact",
+      "name": "Result handle",
+      "purpose": "Result wrapper returned by enqueue; caches fetched values and exposes task id and revoke id.",
+      "inputs": [
+        "Huey instance",
+        "Task instance"
+      ],
+      "outputs": [
+        "get() call",
+        "revoke/reschedule actions"
+      ],
+      "source_refs": [
+        "s029"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "result-retrieval",
+      "module_id": "results",
+      "kind": "output",
+      "name": "Result retrieval",
+      "purpose": "Reads the task id from the result store, optionally blocks with backoff via storage.wait_result, and raises TaskException for stored Error values.",
+      "inputs": [
+        "Result handle",
+        "result store read"
+      ],
+      "outputs": [
+        "task return value",
+        "TaskException on stored error"
+      ],
+      "source_refs": [
+        "s030",
+        "s031"
+      ],
+      "prompt_refs": []
+    }
+  ],
+  "edges": [
+    {
+      "from": "task-declare",
+      "to": "task-registry",
+      "type": "write",
+      "label": "register task class",
+      "primary": false,
+      "source_refs": [
+        "s025",
+        "s055"
+      ]
+    },
+    {
+      "from": "task-declare",
+      "to": "invoke-task",
+      "type": "flow",
+      "label": "decorator returns callable wrapper",
+      "primary": false,
+      "source_refs": [
+        "s025",
+        "s027"
+      ]
+    },
+    {
+      "from": "invoke-task",
+      "to": "enqueue",
+      "type": "flow",
+      "label": "build Task and enqueue",
+      "primary": true,
+      "source_refs": [
+        "s027",
+        "s012"
+      ]
+    },
+    {
+      "from": "enqueue",
+      "to": "message-codec",
+      "type": "flow",
+      "label": "serialize Task to Message",
+      "primary": true,
+      "source_refs": [
+        "s012",
+        "s057"
+      ]
+    },
+    {
+      "from": "message-codec",
+      "to": "serializer",
+      "type": "flow",
+      "label": "pickle Message",
+      "primary": true,
+      "source_refs": [
+        "s057",
+        "s059"
+      ]
+    },
+    {
+      "from": "serializer",
+      "to": "queue-store",
+      "type": "write",
+      "label": "persist serialized task bytes",
+      "primary": true,
+      "source_refs": [
+        "s059",
+        "s049"
+      ]
+    },
+    {
+      "from": "enqueue",
+      "to": "result-handle",
+      "type": "return",
+      "label": "immediate Result handle",
+      "primary": false,
+      "source_refs": [
+        "s012",
+        "s029"
+      ]
+    },
+    {
+      "from": "queue-store",
+      "to": "worker-dequeue",
+      "type": "read",
+      "label": "dequeue next task",
+      "primary": true,
+      "source_refs": [
+        "s050",
+        "s035"
+      ]
+    },
+    {
+      "from": "worker-dequeue",
+      "to": "execute",
+      "type": "flow",
+      "label": "execute dequeued task",
+      "primary": true,
+      "source_refs": [
+        "s035",
+        "s015"
+      ]
+    },
+    {
+      "from": "execute",
+      "to": "ready-decision",
+      "type": "flow",
+      "label": "check eta/readiness",
+      "primary": true,
+      "source_refs": [
+        "s015",
+        "s018"
+      ]
+    },
+    {
+      "from": "ready-decision",
+      "to": "run-task",
+      "type": "flow",
+      "label": "task ready to run",
+      "primary": true,
+      "source_refs": [
+        "s015",
+        "s016"
+      ]
+    },
+    {
+      "from": "ready-decision",
+      "to": "schedule-add",
+      "type": "flow",
+      "label": "task eta in future",
+      "primary": false,
+      "source_refs": [
+        "s015",
+        "s018"
+      ]
+    },
+    {
+      "from": "schedule-add",
+      "to": "schedule-store",
+      "type": "write",
+      "label": "store scheduled task",
+      "primary": false,
+      "source_refs": [
+        "s018",
+        "s050"
+      ]
+    },
+    {
+      "from": "schedule-store",
+      "to": "scheduler-loop",
+      "type": "read",
+      "label": "read due tasks",
+      "primary": false,
+      "source_refs": [
+        "s051",
+        "s036"
+      ]
+    },
+    {
+      "from": "scheduler-loop",
+      "to": "enqueue",
+      "type": "flow",
+      "label": "enqueue due scheduled task",
+      "primary": false,
+      "source_refs": [
+        "s036",
+        "s012"
+      ]
+    },
+    {
+      "from": "scheduler-loop",
+      "to": "periodic-dispatch",
+      "type": "flow",
+      "label": "periodic check due",
+      "primary": false,
+      "source_refs": [
+        "s036",
+        "s037"
+      ]
+    },
+    {
+      "from": "periodic-dispatch",
+      "to": "enqueue",
+      "type": "flow",
+      "label": "enqueue periodic task",
+      "primary": false,
+      "source_refs": [
+        "s037",
+        "s012"
+      ]
+    },
+    {
+      "from": "run-task",
+      "to": "result-store",
+      "type": "write",
+      "label": "store task return value",
+      "primary": true,
+      "source_refs": [
+        "s016",
+        "s052"
+      ]
+    },
+    {
+      "from": "run-task",
+      "to": "failure-state",
+      "type": "flow",
+      "label": "exception raised",
+      "primary": false,
+      "source_refs": [
+        "s016",
+        "s017"
+      ]
+    },
+    {
+      "from": "failure-state",
+      "to": "retry-schedule",
+      "type": "flow",
+      "label": "retry available",
+      "primary": false,
+      "source_refs": [
+        "s016",
+        "s017"
+      ]
+    },
+    {
+      "from": "failure-state",
+      "to": "result-store",
+      "type": "write",
+      "label": "store final error when retries exhausted",
+      "primary": false,
+      "source_refs": [
+        "s017",
+        "s052"
+      ]
+    },
+    {
+      "from": "retry-schedule",
+      "to": "schedule-add",
+      "type": "flow",
+      "label": "retry at eta",
+      "primary": false,
+      "source_refs": [
+        "s016",
+        "s018"
+      ]
+    },
+    {
+      "from": "result-store",
+      "to": "result-retrieval",
+      "type": "read",
+      "label": "fetch task result",
+      "primary": true,
+      "source_refs": [
+        "s052",
+        "s030"
+      ]
+    },
+    {
+      "from": "result-handle",
+      "to": "result-retrieval",
+      "type": "flow",
+      "label": "call Result.get()",
+      "primary": false,
+      "source_refs": [
+        "s029",
+        "s030"
+      ]
+    },
+    {
+      "from": "consumer-supervisor",
+      "to": "worker-dequeue",
+      "type": "flow",
+      "label": "start and supervise worker process",
+      "primary": false,
+      "source_refs": [
+        "s042",
+        "s035"
+      ]
+    },
+    {
+      "from": "consumer-supervisor",
+      "to": "scheduler-loop",
+      "type": "flow",
+      "label": "start and supervise scheduler process",
+      "primary": false,
+      "source_refs": [
+        "s042",
+        "s036"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "s001",
+      "path": "README.rst",
+      "start_line": 1,
+      "end_line": 36,
+      "evidence_kind": "documentation"
+    },
+    {
+      "id": "s002",
+      "path": "README.rst",
+      "start_line": 37,
+      "end_line": 72,
+      "evidence_kind": "documentation"
+    },
+    {
+      "id": "s003",
+      "path": "README.rst",
+      "start_line": 73,
+      "end_line": 108,
+      "evidence_kind": "documentation"
+    },
+    {
+      "id": "s004",
+      "path": "README.rst",
+      "start_line": 109,
+      "end_line": 144,
+      "evidence_kind": "documentation"
+    },
+    {
+      "id": "s005",
+      "path": "README.rst",
+      "start_line": 145,
+      "end_line": 153,
+      "evidence_kind": "documentation"
+    },
+    {
+      "id": "s006",
+      "path": "huey/api.py",
+      "start_line": 52,
+      "end_line": 87,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s007",
+      "path": "huey/api.py",
+      "start_line": 88,
+      "end_line": 123,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s008",
+      "path": "huey/api.py",
+      "start_line": 124,
+      "end_line": 159,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s009",
+      "path": "huey/api.py",
+      "start_line": 160,
+      "end_line": 195,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s010",
+      "path": "huey/api.py",
+      "start_line": 196,
+      "end_line": 231,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s011",
+      "path": "huey/api.py",
+      "start_line": 232,
+      "end_line": 250,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s012",
+      "path": "huey/api.py",
+      "start_line": 307,
+      "end_line": 342,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s013",
+      "path": "huey/api.py",
+      "start_line": 343,
+      "end_line": 378,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s014",
+      "path": "huey/api.py",
+      "start_line": 379,
+      "end_line": 414,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s015",
+      "path": "huey/api.py",
+      "start_line": 415,
+      "end_line": 450,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s016",
+      "path": "huey/api.py",
+      "start_line": 451,
+      "end_line": 486,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s017",
+      "path": "huey/api.py",
+      "start_line": 487,
+      "end_line": 520,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s018",
+      "path": "huey/api.py",
+      "start_line": 742,
+      "end_line": 777,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s019",
+      "path": "huey/api.py",
+      "start_line": 778,
+      "end_line": 813,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s020",
+      "path": "huey/api.py",
+      "start_line": 814,
+      "end_line": 849,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s021",
+      "path": "huey/api.py",
+      "start_line": 850,
+      "end_line": 885,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s022",
+      "path": "huey/api.py",
+      "start_line": 886,
+      "end_line": 921,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s023",
+      "path": "huey/api.py",
+      "start_line": 922,
+      "end_line": 957,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s024",
+      "path": "huey/api.py",
+      "start_line": 958,
+      "end_line": 980,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s025",
+      "path": "huey/api.py",
+      "start_line": 982,
+      "end_line": 1017,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s026",
+      "path": "huey/api.py",
+      "start_line": 1018,
+      "end_line": 1053,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s027",
+      "path": "huey/api.py",
+      "start_line": 1054,
+      "end_line": 1089,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s028",
+      "path": "huey/api.py",
+      "start_line": 1090,
+      "end_line": 1105,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s029",
+      "path": "huey/api.py",
+      "start_line": 1241,
+      "end_line": 1276,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s030",
+      "path": "huey/api.py",
+      "start_line": 1277,
+      "end_line": 1312,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s031",
+      "path": "huey/api.py",
+      "start_line": 1313,
+      "end_line": 1348,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s032",
+      "path": "huey/api.py",
+      "start_line": 1349,
+      "end_line": 1365,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s033",
+      "path": "huey/consumer.py",
+      "start_line": 40,
+      "end_line": 75,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s034",
+      "path": "huey/consumer.py",
+      "start_line": 76,
+      "end_line": 111,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s035",
+      "path": "huey/consumer.py",
+      "start_line": 112,
+      "end_line": 147,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s036",
+      "path": "huey/consumer.py",
+      "start_line": 148,
+      "end_line": 183,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s037",
+      "path": "huey/consumer.py",
+      "start_line": 184,
+      "end_line": 219,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s038",
+      "path": "huey/consumer.py",
+      "start_line": 220,
+      "end_line": 220,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s039",
+      "path": "huey/consumer.py",
+      "start_line": 284,
+      "end_line": 319,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s040",
+      "path": "huey/consumer.py",
+      "start_line": 320,
+      "end_line": 355,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s041",
+      "path": "huey/consumer.py",
+      "start_line": 356,
+      "end_line": 391,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s042",
+      "path": "huey/consumer.py",
+      "start_line": 392,
+      "end_line": 427,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s043",
+      "path": "huey/consumer.py",
+      "start_line": 428,
+      "end_line": 463,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s044",
+      "path": "huey/consumer.py",
+      "start_line": 464,
+      "end_line": 499,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s045",
+      "path": "huey/consumer.py",
+      "start_line": 500,
+      "end_line": 535,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s046",
+      "path": "huey/consumer.py",
+      "start_line": 536,
+      "end_line": 571,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s047",
+      "path": "huey/consumer.py",
+      "start_line": 572,
+      "end_line": 607,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s048",
+      "path": "huey/consumer.py",
+      "start_line": 608,
+      "end_line": 620,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s049",
+      "path": "huey/storage.py",
+      "start_line": 40,
+      "end_line": 75,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s050",
+      "path": "huey/storage.py",
+      "start_line": 76,
+      "end_line": 111,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s051",
+      "path": "huey/storage.py",
+      "start_line": 112,
+      "end_line": 147,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s052",
+      "path": "huey/storage.py",
+      "start_line": 148,
+      "end_line": 180,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s053",
+      "path": "huey/storage.py",
+      "start_line": 220,
+      "end_line": 255,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s054",
+      "path": "huey/storage.py",
+      "start_line": 256,
+      "end_line": 285,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s055",
+      "path": "huey/registry.py",
+      "start_line": 1,
+      "end_line": 36,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s056",
+      "path": "huey/registry.py",
+      "start_line": 37,
+      "end_line": 72,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s057",
+      "path": "huey/registry.py",
+      "start_line": 73,
+      "end_line": 108,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s058",
+      "path": "huey/registry.py",
+      "start_line": 109,
+      "end_line": 133,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s059",
+      "path": "huey/serializer.py",
+      "start_line": 1,
+      "end_line": 36,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s060",
+      "path": "huey/serializer.py",
+      "start_line": 37,
+      "end_line": 72,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s061",
+      "path": "huey/serializer.py",
+      "start_line": 73,
+      "end_line": 92,
+      "evidence_kind": "code"
+    }
+  ],
+  "prompts": []
+}

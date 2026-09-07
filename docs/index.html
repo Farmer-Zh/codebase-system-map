@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Codebase System Map — Turn a repository into a readable system map</title>
+  <meta name="description" content="An open-source Agent Skill that turns a code repository into one evidence-backed, audience-shaped, standalone HTML system map.">
+  <meta name="keywords" content="codebase visualization, software architecture diagram, repository documentation, code map, developer onboarding, Agent Skill, standalone HTML">
+  <meta name="theme-color" content="#f7f7f5">
+  <link rel="canonical" href="https://farmer-zh.github.io/codebase-system-map/">
+  <link rel="alternate" hreflang="en" href="https://farmer-zh.github.io/codebase-system-map/">
+  <link rel="alternate" hreflang="zh-CN" href="https://farmer-zh.github.io/codebase-system-map/zh/">
+  <link rel="alternate" hreflang="x-default" href="https://farmer-zh.github.io/codebase-system-map/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Codebase System Map">
+  <meta property="og:description" content="Give a coding agent a repository. Get one product-readable, evidence-backed system map.">
+  <meta property="og:url" content="https://farmer-zh.github.io/codebase-system-map/">
+  <link rel="stylesheet" href="assets/site.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Codebase System Map",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Windows, macOS, Linux",
+    "description": "An open-source Agent Skill that turns a code repository into an evidence-backed standalone HTML system map.",
+    "url": "https://farmer-zh.github.io/codebase-system-map/",
+    "codeRepository": "https://github.com/Farmer-Zh/codebase-system-map",
+    "license": "https://opensource.org/license/mit"
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="brand" href="#top"><span class="brand-mark">MAP</span> Codebase System Map</a>
+      <div class="nav-links">
+        <a href="#how">How it works</a>
+        <a href="#showcases">Showcases</a>
+        <a href="#install">Install</a>
+        <a class="github-link" href="https://github.com/Farmer-Zh/codebase-system-map">GitHub ↗</a>
+        <a class="language-link" href="zh/" lang="zh-CN">中文</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="eyebrow">Open-source Agent Skill</div>
+          <h1>See the system inside the code.</h1>
+          <p class="hero-copy">Give your coding agent a repository and describe who needs to understand it. Get one clear, evidence-backed HTML map shaped for that reader—not another exhaustive call graph.</p>
+          <div class="actions">
+            <a class="button primary" href="showcases/full-stack-fastapi-template.html">Open a product map <span aria-hidden="true">→</span></a>
+            <a class="button" href="#install">Install the Skill</a>
+          </div>
+          <p class="hero-note">Local generation · standalone HTML · no server · no second LLM configuration</p>
+        </div>
+
+        <div class="map-window" aria-label="Illustration of a repository transformed into an understandable system map">
+          <div class="map-toolbar"><span>system-map.html</span><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+          <div class="map-canvas">
+            <div class="map-title"><strong>Account &amp; items journey</strong><span>Product view · standard detail</span></div>
+            <i class="flow-line line-a"></i><i class="flow-line line-b"></i><i class="flow-line line-c"></i><i class="flow-line line-d"></i><i class="flow-line line-e"></i>
+            <div class="map-node node-a"><b>Account access</b><small>Sign up, sign in, recovery</small><em>ENTRY</em></div>
+            <div class="map-node node-b"><b>Identity check</b><small>Protect private actions</small><em>DECISION</em></div>
+            <div class="map-node node-c"><b>Owned items</b><small>Create and manage content</small><em>CAPABILITY</em></div>
+            <div class="map-node node-d"><b>Recovery</b><small>Return to a usable account</small><em>FLOW</em></div>
+            <div class="map-node node-e"><b>User outcome</b><small>Safe, visible result</small><em>OUTPUT</em></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section white" id="how">
+      <div class="wrap">
+        <div class="section-heading">
+          <div class="eyebrow">From repository to explanation</div>
+          <h2>Three levels. One reading path.</h2>
+          <p>The map starts with the whole system, then lets readers descend only where the detail helps them make sense of the product or implementation.</p>
+        </div>
+        <figure class="workflow-figure"><img src="assets/workflow.gif" alt="Animated walkthrough from choosing a reader to opening a standalone codebase system map" width="1120" height="700" loading="lazy"><figcaption>Describe the reader → follow evidence → share one offline HTML.</figcaption></figure>
+        <div class="three-up">
+          <article class="feature"><div class="step">01</div><div><h3>System overview</h3><p>What the repository enables, its major responsibilities, and one clear end-to-end path.</p></div></article>
+          <article class="feature"><div class="step">02</div><div><h3>Module views</h3><p>Meaningful boundaries, relationships, decisions, and outcomes—named in language the reader understands.</p></div></article>
+          <article class="feature"><div class="step">03</div><div><h3>Node evidence</h3><p>Purpose, input, output, tight source references, and real prompt excerpts when the codebase contains them.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="conversation">
+      <div class="wrap conversation">
+        <div class="conversation-copy">
+          <div class="eyebrow">The reader sets the map</div>
+          <h2>Ask for the understanding you need.</h2>
+          <p>There are no rigid “product” and “technical” templates. Your agent translates ordinary language into module boundaries, detail, terminology, prompts, relationships, and progressive disclosure.</p>
+        </div>
+        <div class="chat-stack" aria-label="Example conversation with a coding agent">
+          <div class="chat user"><div class="chat-label">You</div><p>Create this for product managers. Emphasize what each module does, user-visible outcomes, and real prompts. Simplify framework and database plumbing.</p></div>
+          <div class="chat agent"><div class="chat-label">Agent shapes the map</div><p>I’ll present capabilities and user journeys first, merge routine infrastructure, and keep source evidence available behind each node.</p></div>
+          <div class="chat user"><div class="chat-label">You · after the first draft</div><p>Make payment recovery more detailed. Show how the two prompts change the final reply, but hide ordinary API wiring.</p></div>
+          <div class="chat agent"><div class="chat-label">Agent revises the model</div><p>I’ll split that module, add prompt-effect relationships, preserve the evidence, revalidate the full path, and replace the HTML only if delivery succeeds.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section white" id="showcases">
+      <div class="wrap">
+        <div class="section-heading">
+          <div class="eyebrow">Generated from public repositories</div>
+          <h2>Three readers. Three different maps.</h2>
+          <p>Each example uses a fixed public commit and includes its revisable JSON IR. Download the HTML and it still works offline.</p>
+        </div>
+        <div class="case-grid">
+          <article class="case">
+            <div class="case-top"><div class="case-kicker">Product map · 5 modules</div><div class="mini-flow"><span>Account</span><i></i><span>Identity</span><i></i><span>Items</span></div></div>
+            <div class="case-body"><h3>Full Stack FastAPI Template</h3><p>Sign-up, sign-in, recovery, and owned items—without making the reader learn container, migration, or generated-client internals.</p><div class="case-meta"><span class="tag">PRODUCT</span><span class="tag">16 NODES</span><span class="tag">52 SOURCES</span></div><div class="case-links"><a href="showcases/full-stack-fastapi-template.html">Open HTML →</a><a href="https://github.com/fastapi/full-stack-fastapi-template">Source ↗</a></div></div>
+          </article>
+          <article class="case">
+            <div class="case-top"><div class="case-kicker">Technical map · 8 modules</div><div class="mini-flow"><span>Declare</span><i></i><span>Queue</span><i></i><span>Worker</span></div></div>
+            <div class="case-body"><h3>Huey</h3><p>How declared tasks become queued work, how workers and the scheduler coordinate, and how retries, failures, and results move.</p><div class="case-meta"><span class="tag">TECHNICAL</span><span class="tag">21 NODES</span><span class="tag">61 SOURCES</span></div><div class="case-links"><a href="showcases/huey.html">Open HTML →</a><a href="https://github.com/coleifer/huey">Source ↗</a></div></div>
+          </article>
+          <article class="case">
+            <div class="case-top"><div class="case-kicker">Mixed map · real prompt</div><div class="mini-flow"><span>Run</span><i></i><span>Tool / handoff</span><i></i><span>Guard</span></div></div>
+            <div class="case-body"><h3>OpenAI Agents SDK</h3><p>The run loop, tools, handoffs, guardrails, sessions, tracing, and a real handoff prompt for a cross-functional reader.</p><div class="case-meta"><span class="tag">MIXED</span><span class="tag">13 NODES</span><span class="tag">1 PROMPT</span></div><div class="case-links"><a href="showcases/openai-agents-python.html">Open HTML →</a><a href="https://github.com/openai/openai-agents-python">Source ↗</a></div></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="install">
+      <div class="wrap">
+        <div class="install-panel">
+          <div><div class="eyebrow">No API configuration</div><h2>Use the agent you already have.</h2><p>Clone once, copy the Skill into your local skills directory, then start a new agent session. Node.js 18+ is the only runtime requirement.</p><p><a href="https://github.com/Farmer-Zh/codebase-system-map#quick-start">Read the full guide →</a></p></div>
+          <div class="code-box" data-code-tabs>
+            <div class="code-tabs" role="tablist" aria-label="Install commands"><button class="active" data-tab="windows" role="tab">Windows</button><button data-tab="unix" role="tab">macOS / Linux</button></div>
+            <div class="code-pane active" data-pane="windows"><button class="copy-button" data-copy data-copied="Copied" data-failed="Select text">Copy</button><pre><code>git clone https://github.com/Farmer-Zh/codebase-system-map.git
+cd codebase-system-map
+$skillPath = Join-Path $env:USERPROFILE ".codex\skills\codebase-system-map"
+New-Item -ItemType Directory -Force $skillPath | Out-Null
+Copy-Item ".\codebase-system-map\*" $skillPath -Recurse -Force</code></pre></div>
+            <div class="code-pane" data-pane="unix"><button class="copy-button" data-copy data-copied="Copied" data-failed="Select text">Copy</button><pre><code>git clone https://github.com/Farmer-Zh/codebase-system-map.git
+cd codebase-system-map
+mkdir -p "$HOME/.codex/skills/codebase-system-map"
+cp -R codebase-system-map/. "$HOME/.codex/skills/codebase-system-map/"</code></pre></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section white" id="libraries">
+      <div class="wrap">
+        <div class="section-heading">
+          <div class="eyebrow">Open-source building blocks</div>
+          <h2>Small by design. Explicit about what it uses.</h2>
+          <p>The Skill’s validator and delivery CLI use only Node.js built-ins. These components are bundled into each standalone HTML so diagrams work without a server or network connection.</p>
+        </div>
+        <div class="library-grid">
+          <article class="library-card"><span class="license">MIT</span><h3>Viz.js 3.29.0</h3><p>The JavaScript wrapper and WebAssembly graph renderer embedded in every generated document.</p></article>
+          <article class="library-card"><span class="license">EPL-2.0</span><h3>Graphviz</h3><p>The DOT layout engine compiled into Viz.js WebAssembly, producing the diagrams’ SVG geometry.</p></article>
+          <article class="library-card"><span class="license">MIT</span><h3>Expat</h3><p>An XML parser included transitively in the Viz.js object-code distribution.</p></article>
+        </div>
+        <p class="plain-note">The website itself uses plain HTML, CSS, and JavaScript—no framework, remote font, CDN, or analytics. Showcase repositories are analysis subjects, not dependencies. See the <a href="https://github.com/Farmer-Zh/codebase-system-map/blob/main/THIRD_PARTY_NOTICES.md">complete third-party notices</a>.</p>
+      </div>
+    </section>
+
+    <section class="closing">
+      <div class="wrap">
+        <div class="eyebrow">A map is a conversation</div>
+        <h2>Make the codebase legible to the people deciding what comes next.</h2>
+        <p>Open source, MIT licensed, cross-platform, and designed to leave you with one file you can actually share.</p>
+        <div class="actions"><a class="button primary" href="https://github.com/Farmer-Zh/codebase-system-map">View on GitHub <span aria-hidden="true">↗</span></a><a class="button" href="showcases/openai-agents-python.html">Explore a prompt-aware map</a></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-row"><span>Codebase System Map · MIT · 2026</span><div class="footer-links"><a href="https://github.com/Farmer-Zh/codebase-system-map/blob/main/README.md">Documentation</a><a href="https://github.com/Farmer-Zh/codebase-system-map/blob/main/THIRD_PARTY_NOTICES.md">Third-party notices</a><a href="https://github.com/Farmer-Zh/codebase-system-map/issues">Issues</a></div></div>
+  </footer>
+  <script src="assets/site.js"></script>
+</body>
+</html>

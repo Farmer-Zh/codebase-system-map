@@ -1,0 +1,102 @@
+{
+  "cases": [
+    {
+      "id": "huey",
+      "repository": "coleifer/huey",
+      "repository_url": "https://github.com/coleifer/huey",
+      "directory": "huey",
+      "expected_revision": "6e8acd022346eeb1b09f46c7fa2612f760ee194b",
+      "license": "MIT",
+      "language": "en",
+      "budget": { "modules": [5, 8], "nodes": [16, 24] },
+      "presentation": {
+        "audience": "technical",
+        "detail_level": "deep",
+        "focus": ["runtime-flow", "state", "interfaces", "source-evidence"],
+        "reader_goal": "Understand how a declared task becomes queued work, how workers and the scheduler coordinate execution, and how results, retries, and failures travel through the system.",
+        "priorities": ["task lifecycle", "worker and scheduler responsibilities", "queue and result state", "retry and failure paths"],
+        "deemphasize": ["individual storage backend implementations", "framework integration examples", "administrative commands"]
+      },
+      "files": [
+        { "path": "README.rst", "ranges": [[1, 220]] },
+        { "path": "huey/api.py", "ranges": [[52, 250], [307, 520], [742, 980], [982, 1105], [1241, 1365]] },
+        { "path": "huey/consumer.py", "ranges": [[40, 220], [284, 620]] },
+        { "path": "huey/storage.py", "ranges": [[40, 180], [220, 285]] },
+        { "path": "huey/registry.py", "ranges": [[1, 180]] },
+        { "path": "huey/serializer.py", "ranges": [[1, 180]] }
+      ]
+    },
+    {
+      "id": "full-stack-fastapi-template",
+      "repository": "fastapi/full-stack-fastapi-template",
+      "repository_url": "https://github.com/fastapi/full-stack-fastapi-template",
+      "directory": "full-stack-fastapi-template",
+      "expected_revision": "cb740b656d7a0a6c5e12c7bf8e50343ec94ee9c7",
+      "license": "MIT",
+      "language": "en",
+      "budget": { "modules": [4, 6], "nodes": [10, 16] },
+      "presentation": {
+        "audience": "product",
+        "detail_level": "standard",
+        "focus": ["capabilities", "state", "interfaces"],
+        "reader_goal": "See the user journey from account access to managing owned items, including the product-visible security and recovery decisions without needing to understand framework plumbing.",
+        "priorities": ["sign-up and sign-in journey", "authenticated item workflow", "account recovery", "frontend-to-backend boundary", "user-visible outcomes"],
+        "deemphasize": ["container and deployment setup", "generated API client internals", "migration mechanics", "ordinary database session plumbing"]
+      },
+      "files": [
+        { "path": "README.md", "ranges": [[1, 220]] },
+        { "path": "backend/app/main.py", "ranges": [[1, 80]] },
+        { "path": "backend/app/api/main.py", "ranges": [[1, 60]] },
+        { "path": "backend/app/api/deps.py", "ranges": [[1, 80]] },
+        { "path": "backend/app/api/routes/login.py", "ranges": [[1, 125]] },
+        { "path": "backend/app/api/routes/users.py", "ranges": [[1, 235]] },
+        { "path": "backend/app/api/routes/items.py", "ranges": [[1, 125]] },
+        { "path": "backend/app/crud.py", "ranges": [[1, 90]] },
+        { "path": "backend/app/models.py", "ranges": [[1, 140]] },
+        { "path": "frontend/src/hooks/useAuth.ts", "ranges": [[1, 90]] },
+        { "path": "frontend/src/routes/login.tsx", "ranges": [[1, 130]] },
+        { "path": "frontend/src/routes/signup.tsx", "ranges": [[1, 135]] },
+        { "path": "frontend/src/routes/recover-password.tsx", "ranges": [[1, 130]] },
+        { "path": "frontend/src/routes/reset-password.tsx", "ranges": [[1, 150]] },
+        { "path": "frontend/src/routes/_layout.tsx", "ranges": [[1, 90]] },
+        { "path": "frontend/src/routes/_layout/items.tsx", "ranges": [[1, 180]] }
+      ]
+    },
+    {
+      "id": "openai-agents-python",
+      "repository": "openai/openai-agents-python",
+      "repository_url": "https://github.com/openai/openai-agents-python",
+      "directory": "openai-agents-python",
+      "expected_revision": "1d471a4775bf2f40179f411824da383deb4c3fca",
+      "license": "MIT",
+      "language": "en",
+      "budget": { "modules": [5, 7], "nodes": [12, 22] },
+      "presentation": {
+        "audience": "mixed",
+        "detail_level": "standard",
+        "focus": ["capabilities", "prompts", "runtime-flow", "state", "interfaces", "source-evidence"],
+        "reader_goal": "Understand how an agent run turns instructions and user input into model decisions, tools, handoffs, guarded outputs, persisted context, and traces that both product and engineering teams can discuss.",
+        "priorities": ["agent run loop", "instructions and handoff prompt effects", "tool execution", "handoffs", "input and output guardrails", "session continuity and tracing"],
+        "deemphasize": ["provider-specific adapters", "voice and realtime subsystems", "low-level streaming event bookkeeping", "sandbox implementation details"]
+      },
+      "files": [
+        { "path": "README.md", "ranges": [[1, 220]] },
+        { "path": "docs/index.md", "ranges": [[1, 180]] },
+        { "path": "docs/agents.md", "ranges": [[1, 240]] },
+        { "path": "docs/running_agents.md", "ranges": [[1, 260]] },
+        { "path": "docs/tools.md", "ranges": [[1, 230]] },
+        { "path": "docs/multi_agent.md", "ranges": [[1, 230]] },
+        { "path": "docs/sessions/index.md", "ranges": [[1, 190]] },
+        { "path": "docs/tracing.md", "ranges": [[1, 180]] },
+        { "path": "src/agents/agent.py", "ranges": [[183, 430]] },
+        { "path": "src/agents/run.py", "ranges": [[255, 520], [544, 820]] },
+        { "path": "src/agents/run_internal/run_loop.py", "ranges": [[2054, 2200], [2402, 2610]] },
+        { "path": "src/agents/run_internal/tool_execution.py", "ranges": [[556, 620], [2308, 2525], [2694, 2760]] },
+        { "path": "src/agents/tool.py", "ranges": [[441, 620], [2458, 2635]] },
+        { "path": "src/agents/handoffs/__init__.py", "ranges": [[49, 190], [222, 360]] },
+        { "path": "src/agents/guardrail.py", "ranges": [[1, 190]] },
+        { "path": "src/agents/extensions/handoff_prompt.py", "ranges": [[1, 35]], "evidence_kind": "prompt" }
+      ]
+    }
+  ]
+}

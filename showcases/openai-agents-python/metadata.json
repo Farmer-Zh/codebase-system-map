@@ -1,0 +1,49 @@
+{
+  "repository": "openai/openai-agents-python",
+  "repository_url": "https://github.com/openai/openai-agents-python",
+  "analyzed_revision": "1d471a4775bf2f40179f411824da383deb4c3fca",
+  "license": "MIT",
+  "language": "en",
+  "presentation": {
+    "audience": "mixed",
+    "detail_level": "standard",
+    "focus": [
+      "capabilities",
+      "prompts",
+      "runtime-flow",
+      "state",
+      "interfaces",
+      "source-evidence"
+    ],
+    "reader_goal": "Understand how an agent run turns instructions and user input into model decisions, tools, handoffs, guarded outputs, persisted context, and traces that both product and engineering teams can discuss.",
+    "priorities": [
+      "agent run loop",
+      "instructions and handoff prompt effects",
+      "tool execution",
+      "handoffs",
+      "input and output guardrails",
+      "session continuity and tracing"
+    ],
+    "deemphasize": [
+      "provider-specific adapters",
+      "voice and realtime subsystems",
+      "low-level streaming event bookkeeping",
+      "sandbox implementation details"
+    ]
+  },
+  "generator": "codebase-system-map skill IR 2.0",
+  "authoring_method": "configured OpenAI-compatible API",
+  "generated_at": "2026-09-06T11:48:53.801Z",
+  "counts": {
+    "modules": 7,
+    "nodes": 13,
+    "edges": 16,
+    "sources": 114,
+    "prompts": 1
+  },
+  "validation": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "html_bytes": 1652882
+}

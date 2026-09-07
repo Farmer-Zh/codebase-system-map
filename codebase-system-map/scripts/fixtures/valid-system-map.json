@@ -1,0 +1,156 @@
+{
+  "meta": {
+    "schema_version": "2.0",
+    "repository": "offline-fixture",
+    "analyzed_revision": "fixture-dirty",
+    "language": "en",
+    "presentation": {
+      "audience": "mixed",
+      "detail_level": "standard",
+      "focus": ["capabilities", "runtime-flow", "prompts"],
+      "reader_goal": "Understand how a request becomes a checked offline document.",
+      "priorities": ["module responsibilities", "prompt-bearing behavior"],
+      "deemphasize": ["ordinary file and function plumbing"]
+    }
+  },
+  "system": {
+    "name": "Offline fixture",
+    "summary": "Turns one request into a checked, shareable document."
+  },
+  "modules": [
+    {
+      "id": "intake",
+      "name": "Request intake",
+      "responsibility": "Accept the requested repository explanation.",
+      "source_refs": ["source-intake"]
+    },
+    {
+      "id": "understanding",
+      "name": "Repository understanding",
+      "responsibility": "Turn repository evidence into a product model.",
+      "source_refs": ["source-prompt"]
+    },
+    {
+      "id": "quality",
+      "name": "Quality checks",
+      "responsibility": "Keep the model within the evidence contract.",
+      "source_refs": ["source-quality"]
+    },
+    {
+      "id": "delivery",
+      "name": "Offline delivery",
+      "responsibility": "Produce the document a reader can share.",
+      "source_refs": ["source-delivery"]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "receive-request",
+      "module_id": "intake",
+      "kind": "entry",
+      "name": "Receive request",
+      "purpose": "Capture the repository and reader intent.",
+      "inputs": ["repository path"],
+      "outputs": ["bounded investigation"],
+      "source_refs": ["source-intake"],
+      "prompt_refs": []
+    },
+    {
+      "id": "build-model",
+      "module_id": "understanding",
+      "kind": "llm",
+      "name": "Build product model",
+      "purpose": "Explain runtime behavior using repository evidence.",
+      "inputs": ["bounded investigation"],
+      "outputs": ["candidate map"],
+      "source_refs": ["source-prompt"],
+      "prompt_refs": ["prompt-model"]
+    },
+    {
+      "id": "check-model",
+      "module_id": "quality",
+      "kind": "decision",
+      "name": "Check evidence",
+      "purpose": "Reject missing evidence and broken paths.",
+      "inputs": ["candidate map"],
+      "outputs": ["validated map"],
+      "source_refs": ["source-quality"],
+      "prompt_refs": []
+    },
+    {
+      "id": "write-document",
+      "module_id": "delivery",
+      "kind": "output",
+      "name": "Write document",
+      "purpose": "Create a standalone HTML system map.",
+      "inputs": ["validated map"],
+      "outputs": ["system-map.html"],
+      "source_refs": ["source-delivery"],
+      "prompt_refs": []
+    }
+  ],
+  "edges": [
+    {
+      "from": "receive-request",
+      "to": "build-model",
+      "type": "flow",
+      "label": "investigation",
+      "primary": true,
+      "source_refs": ["source-intake", "source-prompt"]
+    },
+    {
+      "from": "build-model",
+      "to": "check-model",
+      "type": "flow",
+      "label": "candidate",
+      "primary": true,
+      "source_refs": ["source-prompt", "source-quality"]
+    },
+    {
+      "from": "check-model",
+      "to": "write-document",
+      "type": "flow",
+      "label": "validated map",
+      "primary": true,
+      "source_refs": ["source-quality", "source-delivery"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "source-intake",
+      "path": "app.txt",
+      "start_line": 1,
+      "end_line": 1,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "source-prompt",
+      "path": "app.txt",
+      "start_line": 2,
+      "end_line": 2,
+      "evidence_kind": "prompt"
+    },
+    {
+      "id": "source-quality",
+      "path": "app.txt",
+      "start_line": 3,
+      "end_line": 3,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "source-delivery",
+      "path": "app.txt",
+      "start_line": 4,
+      "end_line": 4,
+      "evidence_kind": "code"
+    }
+  ],
+  "prompts": [
+    {
+      "id": "prompt-model",
+      "source_ref": "source-prompt",
+      "title": "Product explanation instruction",
+      "excerpt": "Explain the verified runtime path to a product reader."
+    }
+  ]
+}

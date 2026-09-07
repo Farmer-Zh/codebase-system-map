@@ -1,0 +1,1084 @@
+{
+  "meta": {
+    "schema_version": "2.0",
+    "repository": "fastapi/full-stack-fastapi-template",
+    "analyzed_revision": "cb740b656d7a0a6c5e12c7bf8e50343ec94ee9c7",
+    "language": "en",
+    "presentation": {
+      "audience": "product",
+      "detail_level": "standard",
+      "focus": [
+        "capabilities",
+        "state",
+        "interfaces"
+      ],
+      "reader_goal": "See the user journey from account access to managing owned items, including the product-visible security and recovery decisions without needing to understand framework plumbing.",
+      "priorities": [
+        "sign-up and sign-in journey",
+        "authenticated item workflow",
+        "account recovery",
+        "frontend-to-backend boundary",
+        "user-visible outcomes"
+      ],
+      "deemphasize": [
+        "container and deployment setup",
+        "generated API client internals",
+        "migration mechanics",
+        "ordinary database session plumbing"
+      ]
+    }
+  },
+  "system": {
+    "name": "Full Stack FastAPI Template",
+    "summary": "A full-stack web application template with a React frontend and FastAPI backend, providing user authentication, account recovery, and item management."
+  },
+  "modules": [
+    {
+      "id": "frontend-auth",
+      "name": "Frontend Authentication",
+      "responsibility": "Handles user sign-up, sign-in, logout, and password recovery flows in the React frontend.",
+      "source_refs": [
+        "s030",
+        "s031",
+        "s032",
+        "s033",
+        "s034",
+        "s035",
+        "s036",
+        "s037",
+        "s038",
+        "s039",
+        "s040",
+        "s041",
+        "s042",
+        "s043",
+        "s044",
+        "s045",
+        "s046",
+        "s047",
+        "s048"
+      ]
+    },
+    {
+      "id": "backend-auth",
+      "name": "Backend Authentication",
+      "responsibility": "Provides API endpoints for login, token validation, password recovery, and password reset, enforcing security measures.",
+      "source_refs": [
+        "s009",
+        "s010",
+        "s011",
+        "s012"
+      ]
+    },
+    {
+      "id": "user-management",
+      "name": "User Management",
+      "responsibility": "Manages user accounts including registration, profile updates, password changes, and admin operations.",
+      "source_refs": [
+        "s013",
+        "s014",
+        "s015",
+        "s016",
+        "s017",
+        "s018",
+        "s019"
+      ]
+    },
+    {
+      "id": "item-management",
+      "name": "Item Management",
+      "responsibility": "Handles CRUD operations for items owned by users, with permission checks.",
+      "source_refs": [
+        "s020",
+        "s021",
+        "s022",
+        "s023"
+      ]
+    },
+    {
+      "id": "data-access",
+      "name": "Data Access and Security",
+      "responsibility": "Provides database session management, user authentication dependency, and password hashing utilities.",
+      "source_refs": [
+        "s007",
+        "s008",
+        "s024",
+        "s025"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "signup-form",
+      "module_id": "frontend-auth",
+      "kind": "entry",
+      "name": "Sign Up Form",
+      "purpose": "Collects user registration details (email, full name, password) and submits to the backend.",
+      "inputs": [
+        "User registration data"
+      ],
+      "outputs": [
+        "UserRegister payload"
+      ],
+      "source_refs": [
+        "s036",
+        "s037",
+        "s038",
+        "s039"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "login-form",
+      "module_id": "frontend-auth",
+      "kind": "entry",
+      "name": "Login Form",
+      "purpose": "Collects email and password for authentication and initiates login.",
+      "inputs": [
+        "Email",
+        "Password"
+      ],
+      "outputs": [
+        "AccessToken request"
+      ],
+      "source_refs": [
+        "s032",
+        "s033",
+        "s034",
+        "s035"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "recover-password-form",
+      "module_id": "frontend-auth",
+      "kind": "entry",
+      "name": "Recover Password Form",
+      "purpose": "Collects user email to request a password recovery link.",
+      "inputs": [
+        "Email"
+      ],
+      "outputs": [
+        "Password recovery request"
+      ],
+      "source_refs": [
+        "s040",
+        "s041",
+        "s042",
+        "s043"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "reset-password-form",
+      "module_id": "frontend-auth",
+      "kind": "entry",
+      "name": "Reset Password Form",
+      "purpose": "Collects new password and confirmation using a token from the recovery email.",
+      "inputs": [
+        "New password",
+        "Confirmation",
+        "Token"
+      ],
+      "outputs": [
+        "Password reset request"
+      ],
+      "source_refs": [
+        "s044",
+        "s045",
+        "s046",
+        "s047",
+        "s048"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "auth-hook",
+      "module_id": "frontend-auth",
+      "kind": "stage",
+      "name": "Authentication State and Actions",
+      "purpose": "Coordinates sign-in, sign-up, sign-out, stored access state, and navigation into authenticated product areas.",
+      "inputs": [
+        "Login credentials",
+        "Sign-up data"
+      ],
+      "outputs": [
+        "Access token stored",
+        "User object",
+        "Navigation actions"
+      ],
+      "source_refs": [
+        "s030",
+        "s031"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "login-endpoint",
+      "module_id": "backend-auth",
+      "kind": "stage",
+      "name": "Login Endpoint",
+      "purpose": "Authenticates user credentials and returns a JWT access token.",
+      "inputs": [
+        "OAuth2 form data (email, password)"
+      ],
+      "outputs": [
+        "Access token"
+      ],
+      "source_refs": [
+        "s009",
+        "s010"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "recover-password-endpoint",
+      "module_id": "backend-auth",
+      "kind": "stage",
+      "name": "Recover Password Endpoint",
+      "purpose": "Generates a password reset token and sends an email if the user exists, without revealing account existence.",
+      "inputs": [
+        "Email"
+      ],
+      "outputs": [
+        "Password reset email",
+        "Generic success message"
+      ],
+      "source_refs": [
+        "s010",
+        "s011"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "reset-password-endpoint",
+      "module_id": "backend-auth",
+      "kind": "stage",
+      "name": "Reset Password Endpoint",
+      "purpose": "Validates the reset token and updates the user's password.",
+      "inputs": [
+        "Token",
+        "New password"
+      ],
+      "outputs": [
+        "Password updated message"
+      ],
+      "source_refs": [
+        "s011"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "signup-endpoint",
+      "module_id": "user-management",
+      "kind": "stage",
+      "name": "Sign Up Endpoint",
+      "purpose": "Creates a new user account without requiring authentication.",
+      "inputs": [
+        "UserRegister data"
+      ],
+      "outputs": [
+        "UserPublic object"
+      ],
+      "source_refs": [
+        "s017"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "user-profile-endpoints",
+      "module_id": "user-management",
+      "kind": "stage",
+      "name": "User Profile Endpoints",
+      "purpose": "Allows users to view and update their own profile and password.",
+      "inputs": [
+        "Current user",
+        "Update data"
+      ],
+      "outputs": [
+        "Updated user profile",
+        "Password update message"
+      ],
+      "source_refs": [
+        "s015",
+        "s016"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "admin-user-endpoints",
+      "module_id": "user-management",
+      "kind": "stage",
+      "name": "Admin User Endpoints",
+      "purpose": "Provides admin-only operations to list, create, update, and delete users.",
+      "inputs": [
+        "Admin credentials",
+        "User data"
+      ],
+      "outputs": [
+        "User lists",
+        "User objects",
+        "Deletion messages"
+      ],
+      "source_refs": [
+        "s013",
+        "s014",
+        "s018",
+        "s019"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "items-list",
+      "module_id": "item-management",
+      "kind": "output",
+      "name": "Owned Items Workspace",
+      "purpose": "Presents the authenticated user's items as a table or a clear empty state, with an action to create and manage items.",
+      "inputs": [
+        "Authenticated user",
+        "Items response"
+      ],
+      "outputs": [
+        "Items table or empty state",
+        "Create and manage item actions"
+      ],
+      "source_refs": [
+        "s020",
+        "s021",
+        "s051",
+        "s052"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "item-crud",
+      "module_id": "item-management",
+      "kind": "stage",
+      "name": "Item CRUD Operations",
+      "purpose": "Creates, reads, updates, and deletes items with ownership and permission checks.",
+      "inputs": [
+        "Current user",
+        "Item data",
+        "Item ID"
+      ],
+      "outputs": [
+        "ItemPublic object",
+        "Deletion message"
+      ],
+      "source_refs": [
+        "s021",
+        "s022",
+        "s023"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "auth-dependency",
+      "module_id": "data-access",
+      "kind": "decision",
+      "name": "Authentication Dependency",
+      "purpose": "Validates JWT tokens and loads the current user, enforcing active status.",
+      "inputs": [
+        "JWT token"
+      ],
+      "outputs": [
+        "Current user or error"
+      ],
+      "source_refs": [
+        "s007",
+        "s008"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "password-hashing",
+      "module_id": "data-access",
+      "kind": "worker",
+      "name": "Password Hashing and Verification",
+      "purpose": "Hashes passwords on creation/update and verifies credentials during login, including timing attack prevention.",
+      "inputs": [
+        "Plain password",
+        "Hashed password"
+      ],
+      "outputs": [
+        "Hashed password",
+        "Verification result"
+      ],
+      "source_refs": [
+        "s024",
+        "s025"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "database",
+      "module_id": "data-access",
+      "kind": "store",
+      "name": "PostgreSQL Database",
+      "purpose": "Stores users and items with relationships and cascade deletes.",
+      "inputs": [
+        "SQL queries"
+      ],
+      "outputs": [
+        "User and item records"
+      ],
+      "source_refs": [
+        "s026",
+        "s027",
+        "s028"
+      ],
+      "prompt_refs": []
+    }
+  ],
+  "edges": [
+    {
+      "from": "signup-form",
+      "to": "auth-hook",
+      "type": "flow",
+      "label": "Submits registration data",
+      "primary": false,
+      "source_refs": [
+        "s037",
+        "s038"
+      ]
+    },
+    {
+      "from": "login-form",
+      "to": "auth-hook",
+      "type": "flow",
+      "label": "Submits credentials",
+      "primary": true,
+      "source_refs": [
+        "s033",
+        "s034"
+      ]
+    },
+    {
+      "from": "recover-password-form",
+      "to": "recover-password-endpoint",
+      "type": "flow",
+      "label": "Requests recovery email",
+      "primary": false,
+      "source_refs": [
+        "s041",
+        "s042"
+      ]
+    },
+    {
+      "from": "reset-password-form",
+      "to": "reset-password-endpoint",
+      "type": "flow",
+      "label": "Submits new password",
+      "primary": false,
+      "source_refs": [
+        "s046",
+        "s047"
+      ]
+    },
+    {
+      "from": "auth-hook",
+      "to": "login-endpoint",
+      "type": "flow",
+      "label": "Calls login API",
+      "primary": false,
+      "source_refs": [
+        "s030",
+        "s031"
+      ]
+    },
+    {
+      "from": "auth-hook",
+      "to": "signup-endpoint",
+      "type": "flow",
+      "label": "Calls signup API",
+      "primary": false,
+      "source_refs": [
+        "s030",
+        "s031"
+      ]
+    },
+    {
+      "from": "login-endpoint",
+      "to": "auth-dependency",
+      "type": "read",
+      "label": "Authenticates user",
+      "primary": false,
+      "source_refs": [
+        "s009",
+        "s010"
+      ]
+    },
+    {
+      "from": "login-endpoint",
+      "to": "password-hashing",
+      "type": "flow",
+      "label": "Verifies password",
+      "primary": false,
+      "source_refs": [
+        "s009",
+        "s010"
+      ]
+    },
+    {
+      "from": "password-hashing",
+      "to": "database",
+      "type": "read",
+      "label": "Fetches user record",
+      "primary": false,
+      "source_refs": [
+        "s024",
+        "s025"
+      ]
+    },
+    {
+      "from": "login-endpoint",
+      "to": "auth-hook",
+      "type": "return",
+      "label": "Returns access token",
+      "primary": false,
+      "source_refs": [
+        "s010"
+      ]
+    },
+    {
+      "from": "auth-hook",
+      "to": "items-list",
+      "type": "flow",
+      "label": "Navigates to items",
+      "primary": true,
+      "source_refs": [
+        "s031"
+      ]
+    },
+    {
+      "from": "items-list",
+      "to": "auth-dependency",
+      "type": "read",
+      "label": "Requires current user",
+      "primary": false,
+      "source_refs": [
+        "s020"
+      ]
+    },
+    {
+      "from": "items-list",
+      "to": "database",
+      "type": "read",
+      "label": "Queries items",
+      "primary": false,
+      "source_refs": [
+        "s020",
+        "s021"
+      ]
+    },
+    {
+      "from": "items-list",
+      "to": "item-crud",
+      "type": "flow",
+      "label": "Displays items",
+      "primary": false,
+      "source_refs": [
+        "s051",
+        "s052"
+      ]
+    },
+    {
+      "from": "item-crud",
+      "to": "auth-dependency",
+      "type": "read",
+      "label": "Checks permissions",
+      "primary": false,
+      "source_refs": [
+        "s021",
+        "s022"
+      ]
+    },
+    {
+      "from": "item-crud",
+      "to": "database",
+      "type": "write",
+      "label": "Creates/updates/deletes items",
+      "primary": false,
+      "source_refs": [
+        "s021",
+        "s022",
+        "s023"
+      ]
+    },
+    {
+      "from": "item-crud",
+      "to": "items-list",
+      "type": "return",
+      "label": "Returns updated item list",
+      "primary": false,
+      "source_refs": [
+        "s021",
+        "s022"
+      ]
+    },
+    {
+      "from": "recover-password-endpoint",
+      "to": "database",
+      "type": "read",
+      "label": "Looks up user by email",
+      "primary": false,
+      "source_refs": [
+        "s010"
+      ]
+    },
+    {
+      "from": "recover-password-endpoint",
+      "to": "reset-password-endpoint",
+      "type": "flow",
+      "label": "Sends email with token",
+      "primary": false,
+      "source_refs": [
+        "s010",
+        "s011"
+      ]
+    },
+    {
+      "from": "reset-password-endpoint",
+      "to": "password-hashing",
+      "type": "flow",
+      "label": "Hashes new password",
+      "primary": false,
+      "source_refs": [
+        "s011"
+      ]
+    },
+    {
+      "from": "reset-password-endpoint",
+      "to": "database",
+      "type": "write",
+      "label": "Updates user password",
+      "primary": false,
+      "source_refs": [
+        "s011"
+      ]
+    },
+    {
+      "from": "signup-endpoint",
+      "to": "database",
+      "type": "write",
+      "label": "Creates user record",
+      "primary": false,
+      "source_refs": [
+        "s017"
+      ]
+    },
+    {
+      "from": "user-profile-endpoints",
+      "to": "auth-dependency",
+      "type": "read",
+      "label": "Requires current user",
+      "primary": false,
+      "source_refs": [
+        "s015",
+        "s016"
+      ]
+    },
+    {
+      "from": "user-profile-endpoints",
+      "to": "database",
+      "type": "write",
+      "label": "Updates user profile",
+      "primary": false,
+      "source_refs": [
+        "s015",
+        "s016"
+      ]
+    },
+    {
+      "from": "admin-user-endpoints",
+      "to": "auth-dependency",
+      "type": "read",
+      "label": "Requires superuser",
+      "primary": false,
+      "source_refs": [
+        "s013",
+        "s014"
+      ]
+    },
+    {
+      "from": "admin-user-endpoints",
+      "to": "database",
+      "type": "write",
+      "label": "Manages users",
+      "primary": false,
+      "source_refs": [
+        "s013",
+        "s014",
+        "s018",
+        "s019"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "s001",
+      "path": "README.md",
+      "start_line": 1,
+      "end_line": 36,
+      "evidence_kind": "documentation"
+    },
+    {
+      "id": "s002",
+      "path": "README.md",
+      "start_line": 37,
+      "end_line": 72,
+      "evidence_kind": "documentation"
+    },
+    {
+      "id": "s003",
+      "path": "README.md",
+      "start_line": 73,
+      "end_line": 89,
+      "evidence_kind": "documentation"
+    },
+    {
+      "id": "s004",
+      "path": "backend/app/main.py",
+      "start_line": 1,
+      "end_line": 36,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s005",
+      "path": "backend/app/main.py",
+      "start_line": 37,
+      "end_line": 37,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s006",
+      "path": "backend/app/api/main.py",
+      "start_line": 1,
+      "end_line": 15,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s007",
+      "path": "backend/app/api/deps.py",
+      "start_line": 1,
+      "end_line": 36,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s008",
+      "path": "backend/app/api/deps.py",
+      "start_line": 37,
+      "end_line": 58,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s009",
+      "path": "backend/app/api/routes/login.py",
+      "start_line": 1,
+      "end_line": 36,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s010",
+      "path": "backend/app/api/routes/login.py",
+      "start_line": 37,
+      "end_line": 72,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s011",
+      "path": "backend/app/api/routes/login.py",
+      "start_line": 73,
+      "end_line": 108,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s012",
+      "path": "backend/app/api/routes/login.py",
+      "start_line": 109,
+      "end_line": 124,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s013",
+      "path": "backend/app/api/routes/users.py",
+      "start_line": 1,
+      "end_line": 36,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s014",
+      "path": "backend/app/api/routes/users.py",
+      "start_line": 37,
+      "end_line": 72,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s015",
+      "path": "backend/app/api/routes/users.py",
+      "start_line": 73,
+      "end_line": 108,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s016",
+      "path": "backend/app/api/routes/users.py",
+      "start_line": 109,
+      "end_line": 144,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s017",
+      "path": "backend/app/api/routes/users.py",
+      "start_line": 145,
+      "end_line": 180,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s018",
+      "path": "backend/app/api/routes/users.py",
+      "start_line": 181,
+      "end_line": 216,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s019",
+      "path": "backend/app/api/routes/users.py",
+      "start_line": 217,
+      "end_line": 233,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s020",
+      "path": "backend/app/api/routes/items.py",
+      "start_line": 1,
+      "end_line": 36,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s021",
+      "path": "backend/app/api/routes/items.py",
+      "start_line": 37,
+      "end_line": 72,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s022",
+      "path": "backend/app/api/routes/items.py",
+      "start_line": 73,
+      "end_line": 108,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s023",
+      "path": "backend/app/api/routes/items.py",
+      "start_line": 109,
+      "end_line": 114,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s024",
+      "path": "backend/app/crud.py",
+      "start_line": 1,
+      "end_line": 36,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s025",
+      "path": "backend/app/crud.py",
+      "start_line": 37,
+      "end_line": 69,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s026",
+      "path": "backend/app/models.py",
+      "start_line": 1,
+      "end_line": 36,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s027",
+      "path": "backend/app/models.py",
+      "start_line": 37,
+      "end_line": 72,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s028",
+      "path": "backend/app/models.py",
+      "start_line": 73,
+      "end_line": 108,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s029",
+      "path": "backend/app/models.py",
+      "start_line": 109,
+      "end_line": 134,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s030",
+      "path": "frontend/src/hooks/useAuth.ts",
+      "start_line": 1,
+      "end_line": 36,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s031",
+      "path": "frontend/src/hooks/useAuth.ts",
+      "start_line": 37,
+      "end_line": 71,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s032",
+      "path": "frontend/src/routes/login.tsx",
+      "start_line": 1,
+      "end_line": 36,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s033",
+      "path": "frontend/src/routes/login.tsx",
+      "start_line": 37,
+      "end_line": 72,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s034",
+      "path": "frontend/src/routes/login.tsx",
+      "start_line": 73,
+      "end_line": 108,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s035",
+      "path": "frontend/src/routes/login.tsx",
+      "start_line": 109,
+      "end_line": 130,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s036",
+      "path": "frontend/src/routes/signup.tsx",
+      "start_line": 1,
+      "end_line": 36,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s037",
+      "path": "frontend/src/routes/signup.tsx",
+      "start_line": 37,
+      "end_line": 72,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s038",
+      "path": "frontend/src/routes/signup.tsx",
+      "start_line": 73,
+      "end_line": 108,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s039",
+      "path": "frontend/src/routes/signup.tsx",
+      "start_line": 109,
+      "end_line": 135,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s040",
+      "path": "frontend/src/routes/recover-password.tsx",
+      "start_line": 1,
+      "end_line": 36,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s041",
+      "path": "frontend/src/routes/recover-password.tsx",
+      "start_line": 37,
+      "end_line": 72,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s042",
+      "path": "frontend/src/routes/recover-password.tsx",
+      "start_line": 73,
+      "end_line": 108,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s043",
+      "path": "frontend/src/routes/recover-password.tsx",
+      "start_line": 109,
+      "end_line": 130,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s044",
+      "path": "frontend/src/routes/reset-password.tsx",
+      "start_line": 1,
+      "end_line": 36,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s045",
+      "path": "frontend/src/routes/reset-password.tsx",
+      "start_line": 37,
+      "end_line": 72,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s046",
+      "path": "frontend/src/routes/reset-password.tsx",
+      "start_line": 73,
+      "end_line": 108,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s047",
+      "path": "frontend/src/routes/reset-password.tsx",
+      "start_line": 109,
+      "end_line": 144,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s048",
+      "path": "frontend/src/routes/reset-password.tsx",
+      "start_line": 145,
+      "end_line": 150,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s049",
+      "path": "frontend/src/routes/_layout.tsx",
+      "start_line": 1,
+      "end_line": 36,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s050",
+      "path": "frontend/src/routes/_layout.tsx",
+      "start_line": 37,
+      "end_line": 41,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s051",
+      "path": "frontend/src/routes/_layout/items.tsx",
+      "start_line": 1,
+      "end_line": 36,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "s052",
+      "path": "frontend/src/routes/_layout/items.tsx",
+      "start_line": 37,
+      "end_line": 71,
+      "evidence_kind": "code"
+    }
+  ],
+  "prompts": []
+}

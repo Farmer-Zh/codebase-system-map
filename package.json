@@ -1,8 +1,14 @@
 {
   "name": "codebase-system-map",
   "private": true,
+  "description": "Generate evidence-backed, audience-shaped, standalone HTML maps from code repositories.",
   "type": "module",
-  "dependencies": {
-    "@viz-js/viz": "3.29.0"
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "npm run test:skill && npm run test:publication",
+    "test:skill": "node --test tests/system-map-cli.test.mjs",
+    "test:publication": "node --test tests/publication.test.mjs"
   }
 }
