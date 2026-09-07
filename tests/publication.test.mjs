@@ -56,6 +56,18 @@ test('landing-page reading path is explicit and never auto-plays', () => {
   assert.doesNotMatch(script, /setInterval\s*\(/);
 });
 
+test('landing pages present three complete showcases as stable page previews', () => {
+  for (const file of pageFiles) {
+    const html = readFileSync(file, 'utf8');
+    assert.equal([...html.matchAll(/data-showcase-page=/g)].length, 3);
+    assert.equal([...html.matchAll(/class="showcase-preview-image"/g)].length, 3);
+    assert.doesNotMatch(html, /<iframe\b/i);
+    for (const showcase of ['full-stack-fastapi-template', 'huey', 'openai-agents-python']) {
+      assert.match(html, new RegExp(`showcases/${showcase}\\.html`));
+    }
+  }
+});
+
 test('public links use the current GitHub account', () => {
   const files = [
     ...pageFiles,
