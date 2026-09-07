@@ -27,18 +27,27 @@
     ]
   },
   "generator": "codebase-system-map skill IR 2.0",
-  "authoring_method": "configured OpenAI-compatible API",
-  "generated_at": "2026-09-06T11:34:48.658Z",
+  "authoring_method": "Codebase Memory indexed evidence + configured OpenAI-compatible API",
+  "code_intelligence": {
+    "provider": "Codebase Memory",
+    "version": "0.10.8",
+    "mode": "full",
+    "query_policy": "One architecture overview, reader-priority searches, at most nine depth-two traces and source slices, and one targeted code search."
+  },
+  "generated_at": "2026-09-07T10:11:37.490Z",
   "counts": {
-    "modules": 8,
-    "nodes": 21,
-    "edges": 26,
-    "sources": 61,
+    "modules": 5,
+    "nodes": 16,
+    "edges": 18,
+    "sources": 19,
     "prompts": 0
   },
   "validation": {
     "errors": 0,
     "warnings": 0
   },
-  "html_bytes": 1666229
+  "html_bytes": 1638648,
+  "delivery": {
+    "standalone": true
+  }
 }

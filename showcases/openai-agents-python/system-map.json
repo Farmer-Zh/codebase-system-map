@@ -7,14 +7,6 @@
     "presentation": {
       "audience": "mixed",
       "detail_level": "standard",
-      "focus": [
-        "capabilities",
-        "prompts",
-        "runtime-flow",
-        "state",
-        "interfaces",
-        "source-evidence"
-      ],
       "reader_goal": "Understand how an agent run turns instructions and user input into model decisions, tools, handoffs, guarded outputs, persisted context, and traces that both product and engineering teams can discuss.",
       "priorities": [
         "agent run loop",
@@ -29,91 +21,70 @@
         "voice and realtime subsystems",
         "low-level streaming event bookkeeping",
         "sandbox implementation details"
+      ],
+      "focus": [
+        "capabilities",
+        "prompts",
+        "runtime-flow",
+        "state",
+        "interfaces",
+        "source-evidence"
       ]
     }
   },
   "system": {
-    "name": "OpenAI Agents SDK",
-    "summary": "A lightweight, provider-agnostic framework for building multi-agent workflows. It manages the agent run loop, tool execution, handoffs, guardrails, sessions, and tracing, turning instructions and user input into model decisions and final outputs."
+    "name": "OpenAI Agents Python SDK",
+    "summary": "A framework for building agentic applications: an agent run loop turns instructions and user input into model decisions, tool calls, handoffs, and guarded outputs, while persisting session context and emitting traces for observability."
   },
   "modules": [
     {
       "id": "agent-definition",
-      "name": "Agent Definition",
-      "responsibility": "Defines the Agent primitive: instructions, tools, guardrails, handoffs, output types, and lifecycle hooks.",
+      "name": "Agent Definition & Prompt Assembly",
+      "responsibility": "Defines agents, their instructions, tools, handoffs, and guardrails; assembles system prompts and handoff prompts.",
       "source_refs": [
-        "s010",
-        "s011",
-        "s045",
-        "s048",
-        "s049",
-        "s050"
+        "src-agents-agent"
       ]
     },
     {
-      "id": "runner",
-      "name": "Runner and Run Loop",
-      "responsibility": "Orchestrates the agent run loop: invoking the LLM, handling tool calls, handoffs, and final output detection.",
+      "id": "run-loop",
+      "name": "Run Loop & Turn Processing",
+      "responsibility": "Orchestrates the agent run: processes model responses, executes tools, handles handoffs, and finalizes output.",
       "source_refs": [
-        "s017",
-        "s018",
-        "s052",
-        "s053",
-        "s060",
-        "s061"
+        "src-run-loop",
+        "src-agent-runner-helpers"
       ]
     },
     {
       "id": "tool-execution",
-      "name": "Tool Execution",
-      "responsibility": "Executes function tools and other tool types, including approvals, guardrails, and error handling.",
+      "name": "Tool Execution & Approval",
+      "responsibility": "Executes function tools, manages background tasks, and enforces approval workflows.",
       "source_refs": [
-        "s081",
-        "s088",
-        "s090",
-        "s095"
+        "src-tool-execution"
       ]
     },
     {
       "id": "handoffs",
-      "name": "Handoffs",
-      "responsibility": "Enables delegation to other agents via handoff tools, including input filtering and history management.",
+      "name": "Handoffs & History Management",
+      "responsibility": "Transfers control between agents, manages handoff history and input filtering.",
       "source_refs": [
-        "s100",
-        "s102",
-        "s103",
-        "s105"
+        "src-handoffs"
       ]
     },
     {
       "id": "guardrails",
-      "name": "Guardrails",
-      "responsibility": "Provides input and output validation checks that can halt execution via tripwires.",
+      "name": "Guardrails & Safety",
+      "responsibility": "Runs input and output guardrails, detects tripwires, and handles blocked outputs.",
       "source_refs": [
-        "s108",
-        "s110",
-        "s111"
+        "src-guardrails"
       ]
     },
     {
-      "id": "sessions",
-      "name": "Sessions and Memory",
-      "responsibility": "Manages conversation history across runs, including retrieval, merging, and persistence.",
+      "id": "session-tracing",
+      "name": "Session Persistence & Tracing",
+      "responsibility": "Persists conversation history and emits trace spans for model generations and tool activity.",
       "source_refs": [
-        "s034",
-        "s035",
-        "s036",
-        "s037"
-      ]
-    },
-    {
-      "id": "tracing",
-      "name": "Tracing and Observability",
-      "responsibility": "Records spans and traces for agent runs, tool calls, guardrails, and handoffs for debugging and monitoring.",
-      "source_refs": [
-        "s040",
-        "s041",
-        "s042"
+        "src-trace",
+        "src-sandbox-session"
       ]
     }
   ],
@@ -122,248 +93,222 @@
       "id": "agent-entry",
       "module_id": "agent-definition",
       "kind": "entry",
-      "name": "Agent Entry",
-      "purpose": "Entry point for defining an agent with instructions, tools, guardrails, and handoffs.",
+      "name": "Agent Definition & Entry",
+      "purpose": "Entry point for defining an agent with instructions, tools, handoffs, and guardrails.",
       "inputs": [
-        "User configuration"
+        "User-defined agent configuration"
       ],
       "outputs": [
-        "Agent instance"
+        "Agent object with system prompt and tool list"
       ],
       "source_refs": [
-        "s010",
-        "s011"
+        "src-agents-agent"
       ],
       "prompt_refs": []
     },
     {
-      "id": "runner-entry",
-      "module_id": "runner",
-      "kind": "entry",
-      "name": "Runner Entry",
-      "purpose": "Entry point for running an agent; accepts input and starts the run loop.",
-      "inputs": [
-        "Agent",
-        "User input"
-      ],
-      "outputs": [
-        "RunResult"
-      ],
-      "source_refs": [
-        "s017",
-        "s052"
-      ],
-      "prompt_refs": []
-    },
-    {
-      "id": "run-loop",
-      "module_id": "runner",
+      "id": "system-prompt-assembly",
+      "module_id": "agent-definition",
       "kind": "stage",
-      "name": "Agent Run Loop",
-      "purpose": "Iteratively invokes the LLM, processes tool calls and handoffs until final output or max turns.",
+      "name": "System Prompt Assembly",
+      "purpose": "Builds the system prompt from agent instructions and dynamic prompt functions.",
       "inputs": [
-        "Agent",
-        "Input items"
+        "Agent instructions",
+        "Dynamic prompt function output"
       ],
       "outputs": [
-        "Final output or exception"
+        "System prompt string"
       ],
       "source_refs": [
-        "s018",
-        "s053"
+        "src-agents-agent"
       ],
       "prompt_refs": []
     },
     {
-      "id": "llm-invocation",
-      "module_id": "runner",
+      "id": "handoff-prompt-assembly",
+      "module_id": "handoffs",
       "kind": "llm",
-      "name": "LLM Invocation",
-      "purpose": "Calls the model with system prompt, input items, tools, and handoffs; returns model response.",
+      "name": "Handoff Prompt Assembly",
+      "purpose": "Adds handoff instructions to the system prompt to inform the model about available handoffs.",
       "inputs": [
         "System prompt",
-        "Input items",
-        "Tools",
-        "Handoffs"
+        "Handoff instructions"
       ],
       "outputs": [
-        "ModelResponse"
+        "Prompt with handoff instructions"
       ],
       "source_refs": [
-        "s074",
-        "s075",
-        "s076"
+        "src-handoff-prompt"
       ],
       "prompt_refs": [
-        "p001"
+        "prompt-handoff-prefix"
       ]
     },
     {
-      "id": "tool-call-decision",
-      "module_id": "runner",
-      "kind": "decision",
-      "name": "Tool Call Decision",
-      "purpose": "Classifies model output: final output, handoff, or tool calls.",
+      "id": "run-loop-start",
+      "module_id": "run-loop",
+      "kind": "entry",
+      "name": "Run Loop Start",
+      "purpose": "Entry point for running an agent; accepts user input and starts the turn loop.",
       "inputs": [
-        "ModelResponse"
+        "User input",
+        "Agent",
+        "Run configuration"
       ],
       "outputs": [
-        "Action: final, handoff, or tool"
+        "RunResult or RunResultStreaming"
       ],
       "source_refs": [
-        "s018"
+        "src-run-loop"
+      ],
+      "prompt_refs": []
+    },
+    {
+      "id": "model-response-processing",
+      "module_id": "run-loop",
+      "kind": "stage",
+      "name": "Model Response Processing",
+      "purpose": "Processes the model response, appending it to the list of responses and extracting tool calls or final output.",
+      "inputs": [
+        "Model response",
+        "Current items"
+      ],
+      "outputs": [
+        "Processed response",
+        "Tool calls or final output"
+      ],
+      "source_refs": [
+        "src-agent-runner-helpers"
       ],
       "prompt_refs": []
     },
     {
       "id": "tool-execution-node",
       "module_id": "tool-execution",
-      "kind": "tool",
+      "kind": "worker",
       "name": "Tool Execution",
-      "purpose": "Executes function tool calls with approvals, guardrails, and error handling.",
+      "purpose": "Executes function tools, manages background tasks, and handles approval flows.",
       "inputs": [
-        "Tool calls",
-        "Context"
+        "Tool calls from model",
+        "Approval decisions"
       ],
       "outputs": [
-        "Tool results"
+        "Tool results",
+        "Approval requests"
       ],
       "source_refs": [
-        "s081",
-        "s088"
+        "src-tool-execution"
       ],
       "prompt_refs": []
     },
     {
-      "id": "handoff-node",
+      "id": "handoff-execution",
       "module_id": "handoffs",
-      "kind": "tool",
-      "name": "Handoff Tool",
-      "purpose": "Represents a handoff as a tool call; invokes the target agent and transfers conversation.",
+      "kind": "worker",
+      "name": "Handoff Execution",
+      "purpose": "Transfers control to another agent, generating a transfer message and updating history.",
       "inputs": [
         "Handoff tool call",
-        "Conversation history"
+        "Current history"
       ],
       "outputs": [
-        "New agent",
-        "Filtered input"
+        "Transfer message",
+        "Updated history"
       ],
       "source_refs": [
-        "s102",
-        "s103"
+        "src-handoffs"
       ],
       "prompt_refs": []
     },
     {
-      "id": "input-guardrail-node",
+      "id": "input-guardrails",
       "module_id": "guardrails",
       "kind": "stage",
       "name": "Input Guardrails",
-      "purpose": "Runs input validation checks in parallel with agent execution; can halt via tripwire.",
+      "purpose": "Runs input guardrails on user input before model processing; detects tripwires.",
       "inputs": [
         "User input",
-        "Agent"
+        "Guardrail functions"
       ],
       "outputs": [
-        "Guardrail result or exception"
+        "Guardrail results",
+        "Tripwire flag"
       ],
       "source_refs": [
-        "s110",
-        "s111"
+        "src-guardrails"
       ],
       "prompt_refs": []
     },
     {
-      "id": "output-guardrail-node",
+      "id": "output-guardrails",
       "module_id": "guardrails",
       "kind": "stage",
       "name": "Output Guardrails",
-      "purpose": "Validates final agent output; can halt via tripwire.",
+      "purpose": "Runs output guardrails on the final output; handles tripwires and blocked messages.",
       "inputs": [
         "Final output",
-        "Agent"
+        "Guardrail functions"
       ],
       "outputs": [
-        "Guardrail result or exception"
+        "Guardrail results",
+        "Blocked message or final output"
       ],
       "source_refs": [
-        "s111",
-        "s112"
+        "src-run-loop"
       ],
       "prompt_refs": []
     },
     {
-      "id": "session-store",
-      "module_id": "sessions",
+      "id": "session-persistence",
+      "module_id": "session-tracing",
       "kind": "store",
-      "name": "Session Store",
-      "purpose": "Persists and retrieves conversation history for a session.",
+      "name": "Session Persistence",
+      "purpose": "Persists conversation items to the session store for continuity across runs.",
       "inputs": [
-        "Session ID",
-        "Items"
+        "Final turn items",
+        "Response ID"
       ],
       "outputs": [
-        "History items"
+        "Persisted session state"
       ],
       "source_refs": [
-        "s034",
-        "s037",
-        "s038"
+        "src-run-loop"
       ],
       "prompt_refs": []
     },
     {
-      "id": "session-merge",
-      "module_id": "sessions",
-      "kind": "stage",
-      "name": "Session History Merge",
-      "purpose": "Prepends session history to new input before model call.",
-      "inputs": [
-        "Session history",
-        "New input"
-      ],
-      "outputs": [
-        "Merged input items"
-      ],
-      "source_refs": [
-        "s035",
-        "s036"
-      ],
-      "prompt_refs": []
-    },
-    {
-      "id": "trace-recorder",
-      "module_id": "tracing",
+      "id": "trace-generation",
+      "module_id": "session-tracing",
       "kind": "external",
-      "name": "Trace Recorder",
-      "purpose": "Records spans for agent runs, LLM generations, tool calls, guardrails, and handoffs.",
+      "name": "Trace Generation",
+      "purpose": "Emits trace spans for model generations and tool activity for observability.",
       "inputs": [
-        "Run events"
+        "Model response",
+        "Usage data"
       ],
       "outputs": [
-        "Trace data"
+        "Trace spans"
       ],
       "source_refs": [
-        "s040",
-        "s041"
+        "src-trace"
       ],
       "prompt_refs": []
     },
     {
       "id": "final-output",
-      "module_id": "runner",
+      "module_id": "run-loop",
       "kind": "output",
       "name": "Final Output",
-      "purpose": "Returns the final output of the agent run to the caller.",
+      "purpose": "Returns the final output to the caller, either as a result object or streamed events.",
       "inputs": [
-        "Final output from LLM"
+        "Final output value",
+        "Guardrail results"
       ],
       "outputs": [
-        "RunResult.final_output"
+        "RunResult or RunResultStreaming"
       ],
       "source_refs": [
-        "s017",
-        "s018"
+        "src-run-loop"
       ],
       "prompt_refs": []
     }
@@ -371,978 +316,203 @@
   "edges": [
     {
       "from": "agent-entry",
-      "to": "runner-entry",
+      "to": "system-prompt-assembly",
       "type": "flow",
-      "label": "Agent instance passed to Runner",
-      "primary": true,
-      "source_refs": [
-        "s010",
-        "s017"
-      ]
-    },
-    {
-      "from": "runner-entry",
-      "to": "run-loop",
-      "type": "flow",
-      "label": "Starts run loop",
-      "primary": true,
-      "source_refs": [
-        "s052",
-        "s053"
-      ]
-    },
-    {
-      "from": "run-loop",
-      "to": "llm-invocation",
-      "type": "flow",
-      "label": "Invokes LLM with current input",
-      "primary": true,
-      "source_refs": [
-        "s018",
-        "s074"
-      ]
-    },
-    {
-      "from": "llm-invocation",
-      "to": "tool-call-decision",
-      "type": "return",
-      "label": "Model response classified",
-      "primary": true,
-      "source_refs": [
-        "s018"
-      ]
-    },
-    {
-      "from": "tool-call-decision",
-      "to": "tool-execution-node",
-      "type": "dispatch",
-      "label": "Tool calls executed",
+      "label": "defines instructions",
       "primary": false,
       "source_refs": [
-        "s018",
-        "s081"
+        "src-agents-agent"
+      ]
+    },
+    {
+      "from": "system-prompt-assembly",
+      "to": "handoff-prompt-assembly",
+      "type": "flow",
+      "label": "adds handoff instructions",
+      "primary": false,
+      "source_refs": [
+        "src-handoff-prompt"
+      ]
+    },
+    {
+      "from": "run-loop-start",
+      "to": "input-guardrails",
+      "type": "flow",
+      "label": "validates input",
+      "primary": true,
+      "source_refs": [
+        "src-guardrails"
+      ]
+    },
+    {
+      "from": "input-guardrails",
+      "to": "model-response-processing",
+      "type": "flow",
+      "label": "passes input to model",
+      "primary": true,
+      "source_refs": [
+        "src-run-loop"
+      ]
+    },
+    {
+      "from": "model-response-processing",
+      "to": "tool-execution-node",
+      "type": "dispatch",
+      "label": "tool calls",
+      "primary": false,
+      "source_refs": [
+        "src-tool-execution"
+      ]
+    },
+    {
+      "from": "model-response-processing",
+      "to": "handoff-execution",
+      "type": "dispatch",
+      "label": "handoff calls",
+      "primary": false,
+      "source_refs": [
+        "src-handoffs"
       ]
     },
     {
       "from": "tool-execution-node",
-      "to": "run-loop",
-      "type": "feedback",
-      "label": "Tool results appended and loop re-runs",
+      "to": "model-response-processing",
+      "type": "return",
+      "label": "tool results",
       "primary": false,
       "source_refs": [
-        "s018"
+        "src-tool-execution"
       ]
     },
     {
-      "from": "tool-call-decision",
-      "to": "handoff-node",
-      "type": "dispatch",
-      "label": "Handoff invoked",
+      "from": "handoff-execution",
+      "to": "model-response-processing",
+      "type": "return",
+      "label": "handoff result",
       "primary": false,
       "source_refs": [
-        "s018",
-        "s102"
+        "src-handoffs"
       ]
     },
     {
-      "from": "handoff-node",
-      "to": "run-loop",
-      "type": "feedback",
-      "label": "New agent and input re-run loop",
-      "primary": false,
-      "source_refs": [
-        "s018",
-        "s103"
-      ]
-    },
-    {
-      "from": "runner-entry",
-      "to": "input-guardrail-node",
+      "from": "model-response-processing",
+      "to": "output-guardrails",
       "type": "flow",
-      "label": "Input guardrails run in parallel",
-      "primary": false,
-      "source_refs": [
-        "s110"
-      ]
-    },
-    {
-      "from": "input-guardrail-node",
-      "to": "run-loop",
-      "type": "feedback",
-      "label": "Guardrail result may halt run",
-      "primary": false,
-      "source_refs": [
-        "s110"
-      ]
-    },
-    {
-      "from": "tool-call-decision",
-      "to": "output-guardrail-node",
-      "type": "flow",
-      "label": "Final output checked",
+      "label": "final output",
       "primary": true,
       "source_refs": [
-        "s111"
+        "src-run-loop"
       ]
     },
     {
-      "from": "output-guardrail-node",
+      "from": "output-guardrails",
+      "to": "session-persistence",
+      "type": "flow",
+      "label": "persist items",
+      "primary": false,
+      "source_refs": [
+        "src-run-loop"
+      ]
+    },
+    {
+      "from": "output-guardrails",
       "to": "final-output",
       "type": "flow",
-      "label": "Validated output returned",
+      "label": "guarded output",
       "primary": true,
       "source_refs": [
-        "s111"
+        "src-run-loop"
       ]
     },
     {
-      "from": "session-store",
-      "to": "session-merge",
-      "type": "read",
-      "label": "History retrieved",
-      "primary": false,
-      "source_refs": [
-        "s035"
-      ]
-    },
-    {
-      "from": "session-merge",
-      "to": "run-loop",
-      "type": "flow",
-      "label": "Merged input used for model call",
-      "primary": false,
-      "source_refs": [
-        "s035",
-        "s036"
-      ]
-    },
-    {
-      "from": "run-loop",
-      "to": "session-store",
+      "from": "model-response-processing",
+      "to": "trace-generation",
       "type": "write",
-      "label": "New items persisted",
+      "label": "generation span",
       "primary": false,
       "source_refs": [
-        "s035"
-      ]
-    },
-    {
-      "from": "run-loop",
-      "to": "trace-recorder",
-      "type": "write",
-      "label": "Spans recorded",
-      "primary": false,
-      "source_refs": [
-        "s040"
+        "src-trace"
       ]
     }
   ],
   "sources": [
     {
-      "id": "s001",
-      "path": "README.md",
-      "start_line": 1,
-      "end_line": 36,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s002",
-      "path": "README.md",
-      "start_line": 37,
-      "end_line": 72,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s003",
-      "path": "README.md",
-      "start_line": 73,
-      "end_line": 108,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s004",
-      "path": "README.md",
-      "start_line": 109,
-      "end_line": 144,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s005",
-      "path": "README.md",
-      "start_line": 145,
-      "end_line": 180,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s006",
-      "path": "README.md",
-      "start_line": 181,
-      "end_line": 182,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s007",
-      "path": "docs/index.md",
-      "start_line": 1,
-      "end_line": 36,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s008",
-      "path": "docs/index.md",
-      "start_line": 37,
-      "end_line": 72,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s009",
-      "path": "docs/index.md",
-      "start_line": 73,
-      "end_line": 99,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s010",
-      "path": "docs/agents.md",
-      "start_line": 1,
-      "end_line": 36,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s011",
-      "path": "docs/agents.md",
-      "start_line": 37,
-      "end_line": 72,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s012",
-      "path": "docs/agents.md",
-      "start_line": 73,
-      "end_line": 108,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s013",
-      "path": "docs/agents.md",
-      "start_line": 109,
-      "end_line": 144,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s014",
-      "path": "docs/agents.md",
-      "start_line": 145,
-      "end_line": 180,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s015",
-      "path": "docs/agents.md",
-      "start_line": 181,
-      "end_line": 216,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s016",
-      "path": "docs/agents.md",
-      "start_line": 217,
-      "end_line": 240,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s017",
-      "path": "docs/running_agents.md",
-      "start_line": 1,
-      "end_line": 36,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s018",
-      "path": "docs/running_agents.md",
-      "start_line": 37,
-      "end_line": 72,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s019",
-      "path": "docs/running_agents.md",
-      "start_line": 73,
-      "end_line": 108,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s020",
-      "path": "docs/running_agents.md",
-      "start_line": 109,
-      "end_line": 144,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s021",
-      "path": "docs/running_agents.md",
-      "start_line": 145,
-      "end_line": 180,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s022",
-      "path": "docs/running_agents.md",
-      "start_line": 181,
-      "end_line": 216,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s023",
-      "path": "docs/running_agents.md",
-      "start_line": 217,
-      "end_line": 252,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s024",
-      "path": "docs/running_agents.md",
-      "start_line": 253,
-      "end_line": 260,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s025",
-      "path": "docs/tools.md",
-      "start_line": 1,
-      "end_line": 36,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s026",
-      "path": "docs/tools.md",
-      "start_line": 37,
-      "end_line": 72,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s027",
-      "path": "docs/tools.md",
-      "start_line": 73,
-      "end_line": 108,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s028",
-      "path": "docs/tools.md",
-      "start_line": 109,
-      "end_line": 144,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s029",
-      "path": "docs/tools.md",
-      "start_line": 145,
-      "end_line": 180,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s030",
-      "path": "docs/tools.md",
-      "start_line": 181,
-      "end_line": 216,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s031",
-      "path": "docs/tools.md",
-      "start_line": 217,
-      "end_line": 230,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s032",
-      "path": "docs/multi_agent.md",
-      "start_line": 1,
-      "end_line": 36,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s033",
-      "path": "docs/multi_agent.md",
-      "start_line": 37,
-      "end_line": 61,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s034",
-      "path": "docs/sessions/index.md",
-      "start_line": 1,
-      "end_line": 36,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s035",
-      "path": "docs/sessions/index.md",
-      "start_line": 37,
-      "end_line": 72,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s036",
-      "path": "docs/sessions/index.md",
-      "start_line": 73,
-      "end_line": 108,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s037",
-      "path": "docs/sessions/index.md",
-      "start_line": 109,
-      "end_line": 144,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s038",
-      "path": "docs/sessions/index.md",
-      "start_line": 145,
-      "end_line": 180,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s039",
-      "path": "docs/sessions/index.md",
-      "start_line": 181,
-      "end_line": 190,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s040",
-      "path": "docs/tracing.md",
-      "start_line": 1,
-      "end_line": 36,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s041",
-      "path": "docs/tracing.md",
-      "start_line": 37,
-      "end_line": 72,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s042",
-      "path": "docs/tracing.md",
-      "start_line": 73,
-      "end_line": 108,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s043",
-      "path": "docs/tracing.md",
-      "start_line": 109,
-      "end_line": 144,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s044",
-      "path": "docs/tracing.md",
-      "start_line": 145,
-      "end_line": 180,
-      "evidence_kind": "documentation"
-    },
-    {
-      "id": "s045",
+      "id": "src-agents-agent",
       "path": "src/agents/agent.py",
-      "start_line": 183,
-      "end_line": 218,
+      "start_line": 296,
+      "end_line": 1083,
       "evidence_kind": "code"
     },
     {
-      "id": "s046",
-      "path": "src/agents/agent.py",
-      "start_line": 219,
-      "end_line": 254,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s047",
-      "path": "src/agents/agent.py",
-      "start_line": 255,
-      "end_line": 290,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s048",
-      "path": "src/agents/agent.py",
-      "start_line": 291,
-      "end_line": 326,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s049",
-      "path": "src/agents/agent.py",
-      "start_line": 327,
-      "end_line": 362,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s050",
-      "path": "src/agents/agent.py",
-      "start_line": 363,
-      "end_line": 398,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s051",
-      "path": "src/agents/agent.py",
-      "start_line": 399,
-      "end_line": 430,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s052",
-      "path": "src/agents/run.py",
-      "start_line": 255,
-      "end_line": 290,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s053",
-      "path": "src/agents/run.py",
-      "start_line": 291,
-      "end_line": 326,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s054",
-      "path": "src/agents/run.py",
-      "start_line": 327,
-      "end_line": 362,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s055",
-      "path": "src/agents/run.py",
-      "start_line": 363,
-      "end_line": 398,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s056",
-      "path": "src/agents/run.py",
-      "start_line": 399,
-      "end_line": 434,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s057",
-      "path": "src/agents/run.py",
-      "start_line": 435,
-      "end_line": 470,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s058",
-      "path": "src/agents/run.py",
-      "start_line": 471,
-      "end_line": 506,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s059",
-      "path": "src/agents/run.py",
-      "start_line": 507,
-      "end_line": 520,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s060",
-      "path": "src/agents/run.py",
-      "start_line": 544,
-      "end_line": 579,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s061",
-      "path": "src/agents/run.py",
-      "start_line": 580,
-      "end_line": 615,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s062",
-      "path": "src/agents/run.py",
-      "start_line": 616,
-      "end_line": 651,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s063",
-      "path": "src/agents/run.py",
-      "start_line": 652,
-      "end_line": 687,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s064",
-      "path": "src/agents/run.py",
-      "start_line": 688,
-      "end_line": 723,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s065",
-      "path": "src/agents/run.py",
-      "start_line": 724,
-      "end_line": 759,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s066",
-      "path": "src/agents/run.py",
-      "start_line": 760,
-      "end_line": 795,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s067",
-      "path": "src/agents/run.py",
-      "start_line": 796,
-      "end_line": 820,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s068",
+      "id": "src-run-loop",
       "path": "src/agents/run_internal/run_loop.py",
-      "start_line": 2054,
-      "end_line": 2089,
+      "start_line": 491,
+      "end_line": 649,
       "evidence_kind": "code"
     },
     {
-      "id": "s069",
-      "path": "src/agents/run_internal/run_loop.py",
-      "start_line": 2090,
-      "end_line": 2125,
+      "id": "src-agent-runner-helpers",
+      "path": "src/agents/run_internal/agent_runner_helpers.py",
+      "start_line": 494,
+      "end_line": 500,
       "evidence_kind": "code"
     },
     {
-      "id": "s070",
-      "path": "src/agents/run_internal/run_loop.py",
-      "start_line": 2126,
-      "end_line": 2161,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s071",
-      "path": "src/agents/run_internal/run_loop.py",
-      "start_line": 2162,
-      "end_line": 2197,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s072",
-      "path": "src/agents/run_internal/run_loop.py",
-      "start_line": 2198,
-      "end_line": 2200,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s073",
-      "path": "src/agents/run_internal/run_loop.py",
-      "start_line": 2402,
-      "end_line": 2437,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s074",
-      "path": "src/agents/run_internal/run_loop.py",
-      "start_line": 2438,
-      "end_line": 2473,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s075",
-      "path": "src/agents/run_internal/run_loop.py",
-      "start_line": 2474,
-      "end_line": 2509,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s076",
-      "path": "src/agents/run_internal/run_loop.py",
-      "start_line": 2510,
-      "end_line": 2545,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s077",
-      "path": "src/agents/run_internal/run_loop.py",
-      "start_line": 2546,
-      "end_line": 2581,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s078",
-      "path": "src/agents/run_internal/run_loop.py",
-      "start_line": 2582,
-      "end_line": 2610,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s079",
+      "id": "src-tool-execution",
       "path": "src/agents/run_internal/tool_execution.py",
-      "start_line": 556,
-      "end_line": 591,
+      "start_line": 232,
+      "end_line": 324,
       "evidence_kind": "code"
     },
     {
-      "id": "s080",
-      "path": "src/agents/run_internal/tool_execution.py",
-      "start_line": 592,
-      "end_line": 620,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s081",
-      "path": "src/agents/run_internal/tool_execution.py",
-      "start_line": 2308,
-      "end_line": 2343,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s082",
-      "path": "src/agents/run_internal/tool_execution.py",
-      "start_line": 2344,
-      "end_line": 2379,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s083",
-      "path": "src/agents/run_internal/tool_execution.py",
-      "start_line": 2380,
-      "end_line": 2415,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s084",
-      "path": "src/agents/run_internal/tool_execution.py",
-      "start_line": 2416,
-      "end_line": 2451,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s085",
-      "path": "src/agents/run_internal/tool_execution.py",
-      "start_line": 2452,
-      "end_line": 2487,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s086",
-      "path": "src/agents/run_internal/tool_execution.py",
-      "start_line": 2488,
-      "end_line": 2523,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s087",
-      "path": "src/agents/run_internal/tool_execution.py",
-      "start_line": 2524,
-      "end_line": 2525,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s088",
-      "path": "src/agents/run_internal/tool_execution.py",
-      "start_line": 2694,
-      "end_line": 2729,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s089",
-      "path": "src/agents/run_internal/tool_execution.py",
-      "start_line": 2730,
-      "end_line": 2760,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s090",
-      "path": "src/agents/tool.py",
-      "start_line": 441,
-      "end_line": 476,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s091",
-      "path": "src/agents/tool.py",
-      "start_line": 477,
-      "end_line": 512,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s092",
-      "path": "src/agents/tool.py",
-      "start_line": 513,
-      "end_line": 548,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s093",
-      "path": "src/agents/tool.py",
-      "start_line": 549,
-      "end_line": 584,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s094",
-      "path": "src/agents/tool.py",
-      "start_line": 585,
-      "end_line": 620,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s095",
-      "path": "src/agents/tool.py",
-      "start_line": 2458,
-      "end_line": 2493,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s096",
-      "path": "src/agents/tool.py",
-      "start_line": 2494,
-      "end_line": 2529,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s097",
-      "path": "src/agents/tool.py",
-      "start_line": 2530,
-      "end_line": 2565,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s098",
-      "path": "src/agents/tool.py",
-      "start_line": 2566,
-      "end_line": 2601,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s099",
-      "path": "src/agents/tool.py",
-      "start_line": 2602,
-      "end_line": 2635,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s100",
+      "id": "src-handoffs",
       "path": "src/agents/handoffs/__init__.py",
-      "start_line": 49,
-      "end_line": 84,
+      "start_line": 203,
+      "end_line": 204,
       "evidence_kind": "code"
     },
     {
-      "id": "s101",
-      "path": "src/agents/handoffs/__init__.py",
-      "start_line": 85,
-      "end_line": 120,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s102",
-      "path": "src/agents/handoffs/__init__.py",
-      "start_line": 121,
-      "end_line": 156,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s103",
-      "path": "src/agents/handoffs/__init__.py",
-      "start_line": 157,
-      "end_line": 190,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s104",
-      "path": "src/agents/handoffs/__init__.py",
-      "start_line": 222,
-      "end_line": 257,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s105",
-      "path": "src/agents/handoffs/__init__.py",
-      "start_line": 258,
-      "end_line": 293,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s106",
-      "path": "src/agents/handoffs/__init__.py",
-      "start_line": 294,
-      "end_line": 329,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s107",
-      "path": "src/agents/handoffs/__init__.py",
-      "start_line": 330,
-      "end_line": 360,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s108",
-      "path": "src/agents/guardrail.py",
-      "start_line": 1,
-      "end_line": 36,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s109",
-      "path": "src/agents/guardrail.py",
-      "start_line": 37,
-      "end_line": 72,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s110",
-      "path": "src/agents/guardrail.py",
-      "start_line": 73,
-      "end_line": 108,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s111",
-      "path": "src/agents/guardrail.py",
-      "start_line": 109,
-      "end_line": 144,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s112",
-      "path": "src/agents/guardrail.py",
-      "start_line": 145,
-      "end_line": 180,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s113",
-      "path": "src/agents/guardrail.py",
-      "start_line": 181,
-      "end_line": 190,
-      "evidence_kind": "code"
-    },
-    {
-      "id": "s114",
+      "id": "src-handoff-prompt",
       "path": "src/agents/extensions/handoff_prompt.py",
-      "start_line": 1,
-      "end_line": 20,
+      "start_line": 15,
+      "end_line": 19,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "src-guardrails",
+      "path": "src/agents/run_internal/guardrails.py",
+      "start_line": 227,
+      "end_line": 241,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "src-trace",
+      "path": "src/agents/models/_trace.py",
+      "start_line": 42,
+      "end_line": 71,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "src-sandbox-session",
+      "path": "src/agents/sandbox/session/sandbox_session.py",
+      "start_line": 703,
+      "end_line": 708,
+      "evidence_kind": "code"
+    },
+    {
+      "id": "src-handoff-prompt-prefix",
+      "path": "src/agents/extensions/handoff_prompt.py",
+      "start_line": 3,
+      "end_line": 12,
       "evidence_kind": "prompt"
     }
   ],
   "prompts": [
     {
-      "id": "p001",
-      "source_ref": "s114",
-      "title": "Recommended Handoff Prompt Prefix",
-      "excerpt": "You are part of a multi-agent system called the Agents SDK, designed to make agent coordination and execution easy. Agents uses two primary abstraction: **Agents** and **Handoffs**. An agent encompasses instructions and tools and can hand off a conversation to another agent when appropriate. Handoffs are achieved by calling a handoff function, generally named `transfer_to_<agent_name>`. Transfers between agents are handled seamlessly in the background; do not mention or draw attention to these transfers in your conversation with the user."
+      "id": "prompt-handoff-prefix",
+      "source_ref": "src-handoff-prompt-prefix",
+      "title": "Recommended Handoff System Context",
+      "excerpt": "# System context\nYou are part of a multi-agent system called the Agents SDK, designed to make agent coordination and execution easy. Agents uses two primary abstraction: **Agents** and **Handoffs**. An agent encompasses instructions and tools and can hand off a conversation to…"
     }
   ]
 }
