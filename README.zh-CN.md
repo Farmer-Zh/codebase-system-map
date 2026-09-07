@@ -2,7 +2,7 @@
 
 > 给 Coding Agent 一个代码库，得到一份产品人员也能读懂、且有源码证据的系统地图。
 
-[项目主页与在线案例](https://farmer-zh.github.io/codebase-system-map/zh/) · [English](README.md)
+[项目主页与在线案例](https://farmerzh47.github.io/codebase-system-map/zh/) · [English](README.md)
 
 Codebase System Map 是一个用于代码库可视化、软件架构说明和新人上手的开源
 Agent Skill。专用代码智能工具先为整个仓库建立索引，提供详细架构和执行路径；
@@ -26,7 +26,8 @@ HTML。
 
 生成完成后可以关闭 Agent 和终端，HTML 仍然可以正常打开和分享。
 
-![使用流程：确定读者、沿源码取证、打开一份独立 HTML](docs/assets/workflow.gif)
+[交互式阅读路径演示](https://farmerzh47.github.io/codebase-system-map/zh/#how)
+展示同一张地图如何从系统总览进入模块视图和节点证据。
 
 ## 生成的内容
 
@@ -76,7 +77,7 @@ metadata.json 记录了仓库、commit、许可证、展示简报和内容数量
 ### 2. 克隆仓库
 
 ~~~powershell
-git clone https://github.com/Farmer-Zh/codebase-system-map.git
+git clone https://github.com/farmerzh47/codebase-system-map.git
 cd codebase-system-map
 ~~~
 

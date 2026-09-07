@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/Farmer-Zh/codebase-system-map/schemas/system-map.schema.json",
+  "$id": "https://github.com/farmerzh47/codebase-system-map/schemas/system-map.schema.json",
   "title": "Codebase System Map IR 2.0",
   "type": "object",
   "additionalProperties": false,

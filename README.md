@@ -2,7 +2,7 @@
 
 > Give a coding agent a repository. Get one product-readable, evidence-backed system map.
 
-[Website & live showcases](https://farmer-zh.github.io/codebase-system-map/) · [简体中文](README.zh-CN.md)
+[Website & live showcases](https://farmerzh47.github.io/codebase-system-map/) · [简体中文](README.zh-CN.md)
 
 Codebase System Map is an open-source Agent Skill for codebase visualization,
 software architecture documentation, and developer onboarding. A dedicated
@@ -31,7 +31,8 @@ Repository
 The agent and terminal can be closed after generation. The HTML will continue
 to work as a single offline file.
 
-![Workflow: choose the reader, follow source evidence, and open one standalone HTML](docs/assets/workflow.gif)
+The [interactive reading-path demo](https://farmerzh47.github.io/codebase-system-map/#how)
+shows how one map moves from system overview to module view and node evidence.
 
 ## What the map shows
 
@@ -88,7 +89,7 @@ four capabilities.
 ### 2. Clone
 
 ~~~bash
-git clone https://github.com/Farmer-Zh/codebase-system-map.git
+git clone https://github.com/farmerzh47/codebase-system-map.git
 cd codebase-system-map
 ~~~
 

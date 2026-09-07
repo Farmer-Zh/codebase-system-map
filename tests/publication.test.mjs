@@ -42,6 +42,36 @@ test('both landing pages disclose bundled open-source components', () => {
   }
 });
 
+test('landing-page reading path is explicit and never auto-plays', () => {
+  for (const file of pageFiles) {
+    const html = readFileSync(file, 'utf8');
+    assert.match(html, /data-reading-path/);
+    assert.equal([...html.matchAll(/data-reading-step=/g)].length, 3);
+    assert.equal([...html.matchAll(/data-reading-panel=/g)].length, 3);
+    assert.doesNotMatch(html, /workflow\.gif/i);
+  }
+
+  const script = readFileSync(resolve(root, 'docs/assets/site.js'), 'utf8');
+  assert.match(script, /data-reading-step/);
+  assert.doesNotMatch(script, /setInterval\s*\(/);
+});
+
+test('public links use the current GitHub account', () => {
+  const files = [
+    ...pageFiles,
+    resolve(root, 'README.md'),
+    resolve(root, 'README.zh-CN.md'),
+    resolve(root, 'docs/robots.txt'),
+    resolve(root, 'docs/sitemap.xml'),
+    resolve(root, 'codebase-system-map/schemas/system-map.schema.json'),
+  ];
+  for (const file of files) {
+    const text = readFileSync(file, 'utf8');
+    assert.doesNotMatch(text, /Farmer-Zh|farmer-zh\.github\.io/i);
+    assert.match(text, /farmerzh47/i);
+  }
+});
+
 test('published showcases remain standalone HTML documents', () => {
   for (const file of showcaseFiles) {
     const html = readFileSync(file, 'utf8');

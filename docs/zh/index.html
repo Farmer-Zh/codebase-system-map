@@ -7,14 +7,14 @@
   <meta name="description" content="开源 Agent Skill：把代码仓库转化为有源码证据、按照读者需求组织、可以离线分享的单文件 HTML 系统地图。">
   <meta name="keywords" content="代码库可视化, 软件架构图, 代码地图, 系统架构文档, 开发者上手, Agent Skill, 独立 HTML">
   <meta name="theme-color" content="#f7f7f5">
-  <link rel="canonical" href="https://farmer-zh.github.io/codebase-system-map/zh/">
-  <link rel="alternate" hreflang="en" href="https://farmer-zh.github.io/codebase-system-map/">
-  <link rel="alternate" hreflang="zh-CN" href="https://farmer-zh.github.io/codebase-system-map/zh/">
-  <link rel="alternate" hreflang="x-default" href="https://farmer-zh.github.io/codebase-system-map/">
+  <link rel="canonical" href="https://farmerzh47.github.io/codebase-system-map/zh/">
+  <link rel="alternate" hreflang="en" href="https://farmerzh47.github.io/codebase-system-map/">
+  <link rel="alternate" hreflang="zh-CN" href="https://farmerzh47.github.io/codebase-system-map/zh/">
+  <link rel="alternate" hreflang="x-default" href="https://farmerzh47.github.io/codebase-system-map/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Codebase System Map">
   <meta property="og:description" content="给 Coding Agent 一个仓库，得到一份产品人员也能读懂、有源码证据的系统地图。">
-  <meta property="og:url" content="https://farmer-zh.github.io/codebase-system-map/zh/">
+  <meta property="og:url" content="https://farmerzh47.github.io/codebase-system-map/zh/">
   <link rel="stylesheet" href="../assets/site.css">
   <script type="application/ld+json">
   {
@@ -24,8 +24,8 @@
     "applicationCategory": "DeveloperApplication",
     "operatingSystem": "Windows, macOS, Linux",
     "description": "把代码仓库转化为有源码证据、可离线分享的 HTML 系统地图的开源 Agent Skill。",
-    "url": "https://farmer-zh.github.io/codebase-system-map/zh/",
-    "codeRepository": "https://github.com/Farmer-Zh/codebase-system-map",
+    "url": "https://farmerzh47.github.io/codebase-system-map/zh/",
+    "codeRepository": "https://github.com/farmerzh47/codebase-system-map",
     "license": "https://opensource.org/license/mit"
   }
   </script>
@@ -36,7 +36,7 @@
       <a class="brand" href="#top"><span class="brand-mark">MAP</span> Codebase System Map</a>
       <div class="nav-links">
         <a href="#how">如何工作</a><a href="#showcases">案例</a><a href="#install">安装</a>
-        <a class="github-link" href="https://github.com/Farmer-Zh/codebase-system-map">GitHub ↗</a>
+        <a class="github-link" href="https://github.com/farmerzh47/codebase-system-map">GitHub ↗</a>
         <a class="language-link" href="../" lang="en">English</a>
       </div>
     </nav>
@@ -70,11 +70,41 @@
     <section class="section white" id="how">
       <div class="wrap">
         <div class="section-heading"><div class="eyebrow">从代码仓库到系统说明</div><h2>三个层级，一条清楚的阅读路径。</h2><p>先理解系统全貌，再按需进入模块和节点。读者只需要看到真正有助于理解产品或实现的细节。</p></div>
-        <figure class="workflow-figure"><img src="../assets/workflow.gif" alt="从确定读者到打开独立代码库系统地图的动态演示" width="1120" height="700" loading="lazy"><figcaption>说明读者 → 沿源码取证 → 分享一份离线 HTML。</figcaption></figure>
-        <div class="three-up">
-          <article class="feature"><div class="step">01</div><div><h3>系统总览</h3><p>仓库实现什么能力、承担哪些主要职责，以及一条完整的核心路径。</p></div></article>
-          <article class="feature"><div class="step">02</div><div><h3>模块视图</h3><p>有业务或运行意义的边界、关系、判断和结果，并使用读者熟悉的语言。</p></div></article>
-          <article class="feature"><div class="step">03</div><div><h3>节点证据</h3><p>职责、输入、输出、准确源码位置，以及仓库确实包含 LLM 时的真实 Prompt。</p></div></article>
+        <p class="reading-path-note"><strong>这里展示的是同一张地图，不是三个案例。</strong>选择一个层级，看看读者深入阅读时会多理解什么。</p>
+        <div class="reading-path" data-reading-path>
+          <div class="reading-path-tabs" role="tablist" aria-label="地图阅读层级">
+            <button class="reading-step active" type="button" role="tab" id="zh-reading-tab-overview" aria-controls="zh-reading-panel-overview" aria-selected="true" tabindex="0" data-reading-step="overview"><span class="reading-number">01</span><span><strong>系统总览</strong><small>整个系统做什么？</small></span></button>
+            <button class="reading-step" type="button" role="tab" id="zh-reading-tab-module" aria-controls="zh-reading-panel-module" aria-selected="false" tabindex="-1" data-reading-step="module"><span class="reading-number">02</span><span><strong>模块视图</strong><small>每项职责由哪个部分承担？</small></span></button>
+            <button class="reading-step" type="button" role="tab" id="zh-reading-tab-node" aria-controls="zh-reading-panel-node" aria-selected="false" tabindex="-1" data-reading-step="node"><span class="reading-number">03</span><span><strong>节点证据</strong><small>这项说明有什么依据？</small></span></button>
+          </div>
+          <div class="reading-stage">
+            <section class="reading-panel active" role="tabpanel" id="zh-reading-panel-overview" aria-labelledby="zh-reading-tab-overview" data-reading-panel="overview">
+              <div class="reading-preview-heading"><span>第 01 层 · 系统</span><strong>账号与内容旅程</strong><p>先看产品故事，以及一条贯穿整个系统的完整路径。</p></div>
+              <div class="overview-route" aria-label="账号入口经过身份保护和自有内容，最终产生用户可见结果">
+                <div class="route-card blue"><small>入口</small><strong>账号访问</strong><span>注册、登录、找回</span></div><i aria-hidden="true">→</i>
+                <div class="route-card peach"><small>判断</small><strong>身份校验</strong><span>保护私有操作</span></div><i aria-hidden="true">→</i>
+                <div class="route-card green"><small>能力</small><strong>自有内容</strong><span>创建与管理内容</span></div><i aria-hidden="true">→</i>
+                <div class="route-card yellow"><small>结果</small><strong>可见反馈</strong><span>成功或进入恢复</span></div>
+              </div>
+              <p class="reading-takeaway"><strong>读者获得：</strong>系统目标、主要职责和核心旅程，不必先理解实现细节。</p>
+            </section>
+            <section class="reading-panel" role="tabpanel" id="zh-reading-panel-module" aria-labelledby="zh-reading-tab-module" data-reading-panel="module" hidden>
+              <div class="reading-preview-heading"><span>第 02 层 · 模块</span><strong>进入“账号访问”模块</strong><p>只展开一个有意义的边界，其余仓库仍保持简洁。</p></div>
+              <div class="module-preview">
+                <div class="module-summary"><small>模块职责</small><strong>让用户安全进入账号，或者恢复账号。</strong><div class="module-tags"><span>注册</span><span>登录</span><span>找回</span></div></div>
+                <div class="module-route"><div><small>输入</small><strong>登录凭据</strong></div><i aria-hidden="true">→</i><div class="decision-node"><small>判断</small><strong>身份有效？</strong></div><i aria-hidden="true">→</i><div><small>输出</small><strong>会话或恢复流程</strong></div></div>
+              </div>
+              <p class="reading-takeaway"><strong>读者获得：</strong>模块职责、判断、接口、失败路径和结果，并使用适合其角色的语言。</p>
+            </section>
+            <section class="reading-panel" role="tabpanel" id="zh-reading-panel-node" aria-labelledby="zh-reading-tab-node" data-reading-panel="node" hidden>
+              <div class="reading-preview-heading"><span>第 03 层 · 节点</span><strong>为什么需要“身份校验”</strong><p>只有当实现或证据确实重要时，才进入单个节点。</p></div>
+              <div class="node-preview">
+                <div class="node-purpose"><small>职责</small><strong>没有有效用户时，阻止执行私有操作。</strong><p>这个节点把一条产品规则变成明确的系统判断。</p></div>
+                <dl class="node-facts"><div><dt>输入</dt><dd>访问令牌</dd></div><div><dt>输出</dt><dd>当前用户或访问错误</dd></div><div><dt>源码</dt><dd><code>backend/app/api/deps.py:25–46</code></dd></div><div><dt>Prompt</dt><dd>代码中存在真实 Prompt 时在这里展示</dd></div></dl>
+              </div>
+              <p class="reading-takeaway"><strong>读者获得：</strong>职责、输入、输出、准确源码证据，以及相关场景中的真实 Prompt 摘录。</p>
+            </section>
+          </div>
         </div>
       </div>
     </section>
@@ -104,14 +134,14 @@
 
     <section class="section" id="install">
       <div class="wrap"><div class="install-panel">
-        <div><div class="eyebrow">两个专用层</div><h2>先索引，再解释。</h2><p>先安装 Codebase Memory 代码智能工具，再把本 Skill 复制到本地 skills 目录。前者负责完整结构索引，已有 Agent 负责按照读者目标整理内容。</p><p><a href="https://github.com/DeusData/codebase-memory-mcp">安装 Codebase Memory ↗</a><br><a href="https://github.com/Farmer-Zh/codebase-system-map/blob/main/README.zh-CN.md#快速开始">阅读完整指南 →</a></p></div>
+        <div><div class="eyebrow">两个专用层</div><h2>先索引，再解释。</h2><p>先安装 Codebase Memory 代码智能工具，再把本 Skill 复制到本地 skills 目录。前者负责完整结构索引，已有 Agent 负责按照读者目标整理内容。</p><p><a href="https://github.com/DeusData/codebase-memory-mcp">安装 Codebase Memory ↗</a><br><a href="https://github.com/farmerzh47/codebase-system-map/blob/main/README.zh-CN.md#快速开始">阅读完整指南 →</a></p></div>
         <div class="code-box" data-code-tabs><div class="code-tabs" role="tablist" aria-label="安装命令"><button class="active" data-tab="windows" role="tab">Windows</button><button data-tab="unix" role="tab">macOS / Linux</button></div>
-          <div class="code-pane active" data-pane="windows"><button class="copy-button" data-copy data-copied="已复制" data-failed="请选中文字">复制</button><pre><code>git clone https://github.com/Farmer-Zh/codebase-system-map.git
+          <div class="code-pane active" data-pane="windows"><button class="copy-button" data-copy data-copied="已复制" data-failed="请选中文字">复制</button><pre><code>git clone https://github.com/farmerzh47/codebase-system-map.git
 cd codebase-system-map
 $skillPath = Join-Path $env:USERPROFILE ".codex\skills\codebase-system-map"
 New-Item -ItemType Directory -Force $skillPath | Out-Null
 Copy-Item ".\codebase-system-map\*" $skillPath -Recurse -Force</code></pre></div>
-          <div class="code-pane" data-pane="unix"><button class="copy-button" data-copy data-copied="已复制" data-failed="请选中文字">复制</button><pre><code>git clone https://github.com/Farmer-Zh/codebase-system-map.git
+          <div class="code-pane" data-pane="unix"><button class="copy-button" data-copy data-copied="已复制" data-failed="请选中文字">复制</button><pre><code>git clone https://github.com/farmerzh47/codebase-system-map.git
 cd codebase-system-map
 mkdir -p "$HOME/.codex/skills/codebase-system-map"
 cp -R codebase-system-map/. "$HOME/.codex/skills/codebase-system-map/"</code></pre></div>
@@ -128,14 +158,14 @@ cp -R codebase-system-map/. "$HOME/.codex/skills/codebase-system-map/"</code></p
           <article class="library-card"><span class="license">EPL-2.0</span><h3>Graphviz</h3><p>编译进 Viz.js WebAssembly 的 DOT 布局引擎，负责生成图形的 SVG 几何结构。</p></article>
           <article class="library-card"><span class="license">MIT</span><h3>Expat</h3><p>由 Viz.js 对象代码间接包含的 XML 解析器。</p></article>
         </div>
-        <p class="plain-note">Codebase Memory 单独安装，通过它的 Agent Skill 或 MCP 接口使用。网站使用原生 HTML、CSS 和 JavaScript 实现。查看<a href="https://github.com/Farmer-Zh/codebase-system-map/blob/main/THIRD_PARTY_NOTICES.md">完整第三方说明和许可证文本</a>。</p>
+        <p class="plain-note">Codebase Memory 单独安装，通过它的 Agent Skill 或 MCP 接口使用。网站使用原生 HTML、CSS 和 JavaScript 实现。查看<a href="https://github.com/farmerzh47/codebase-system-map/blob/main/THIRD_PARTY_NOTICES.md">完整第三方说明和许可证文本</a>。</p>
       </div>
     </section>
 
-    <section class="closing"><div class="wrap"><div class="eyebrow">地图来自对话</div><h2>让决定下一步的人真正读懂代码库。</h2><p>免费开源、MIT 许可证、跨平台，并且最终只留下一个可以直接分享的文件。</p><div class="actions"><a class="button primary" href="https://github.com/Farmer-Zh/codebase-system-map">在 GitHub 查看 <span aria-hidden="true">↗</span></a><a class="button" href="../showcases/openai-agents-python.html">查看包含 Prompt 的案例</a></div></div></section>
+    <section class="closing"><div class="wrap"><div class="eyebrow">地图来自对话</div><h2>让决定下一步的人真正读懂代码库。</h2><p>免费开源、MIT 许可证、跨平台，并且最终只留下一个可以直接分享的文件。</p><div class="actions"><a class="button primary" href="https://github.com/farmerzh47/codebase-system-map">在 GitHub 查看 <span aria-hidden="true">↗</span></a><a class="button" href="../showcases/openai-agents-python.html">查看包含 Prompt 的案例</a></div></div></section>
   </main>
 
-  <footer class="site-footer"><div class="wrap footer-row"><span>Codebase System Map · MIT · 2026</span><div class="footer-links"><a href="https://github.com/Farmer-Zh/codebase-system-map/blob/main/README.zh-CN.md">使用文档</a><a href="https://github.com/Farmer-Zh/codebase-system-map/blob/main/THIRD_PARTY_NOTICES.md">第三方说明</a><a href="https://github.com/Farmer-Zh/codebase-system-map/issues">问题反馈</a></div></div></footer>
+  <footer class="site-footer"><div class="wrap footer-row"><span>Codebase System Map · MIT · 2026</span><div class="footer-links"><a href="https://github.com/farmerzh47/codebase-system-map/blob/main/README.zh-CN.md">使用文档</a><a href="https://github.com/farmerzh47/codebase-system-map/blob/main/THIRD_PARTY_NOTICES.md">第三方说明</a><a href="https://github.com/farmerzh47/codebase-system-map/issues">问题反馈</a></div></div></footer>
   <script src="../assets/site.js"></script>
 </body>
 </html>

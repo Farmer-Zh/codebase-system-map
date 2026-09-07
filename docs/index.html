@@ -7,14 +7,14 @@
   <meta name="description" content="An open-source Agent Skill that turns a code repository into one evidence-backed, audience-shaped, standalone HTML system map.">
   <meta name="keywords" content="codebase visualization, software architecture diagram, repository documentation, code map, developer onboarding, Agent Skill, standalone HTML">
   <meta name="theme-color" content="#f7f7f5">
-  <link rel="canonical" href="https://farmer-zh.github.io/codebase-system-map/">
-  <link rel="alternate" hreflang="en" href="https://farmer-zh.github.io/codebase-system-map/">
-  <link rel="alternate" hreflang="zh-CN" href="https://farmer-zh.github.io/codebase-system-map/zh/">
-  <link rel="alternate" hreflang="x-default" href="https://farmer-zh.github.io/codebase-system-map/">
+  <link rel="canonical" href="https://farmerzh47.github.io/codebase-system-map/">
+  <link rel="alternate" hreflang="en" href="https://farmerzh47.github.io/codebase-system-map/">
+  <link rel="alternate" hreflang="zh-CN" href="https://farmerzh47.github.io/codebase-system-map/zh/">
+  <link rel="alternate" hreflang="x-default" href="https://farmerzh47.github.io/codebase-system-map/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Codebase System Map">
   <meta property="og:description" content="Give a coding agent a repository. Get one product-readable, evidence-backed system map.">
-  <meta property="og:url" content="https://farmer-zh.github.io/codebase-system-map/">
+  <meta property="og:url" content="https://farmerzh47.github.io/codebase-system-map/">
   <link rel="stylesheet" href="assets/site.css">
   <script type="application/ld+json">
   {
@@ -24,8 +24,8 @@
     "applicationCategory": "DeveloperApplication",
     "operatingSystem": "Windows, macOS, Linux",
     "description": "An open-source Agent Skill that turns a code repository into an evidence-backed standalone HTML system map.",
-    "url": "https://farmer-zh.github.io/codebase-system-map/",
-    "codeRepository": "https://github.com/Farmer-Zh/codebase-system-map",
+    "url": "https://farmerzh47.github.io/codebase-system-map/",
+    "codeRepository": "https://github.com/farmerzh47/codebase-system-map",
     "license": "https://opensource.org/license/mit"
   }
   </script>
@@ -38,7 +38,7 @@
         <a href="#how">How it works</a>
         <a href="#showcases">Showcases</a>
         <a href="#install">Install</a>
-        <a class="github-link" href="https://github.com/Farmer-Zh/codebase-system-map">GitHub ↗</a>
+        <a class="github-link" href="https://github.com/farmerzh47/codebase-system-map">GitHub ↗</a>
         <a class="language-link" href="zh/" lang="zh-CN">中文</a>
       </div>
     </nav>
@@ -80,11 +80,41 @@
           <h2>Three levels. One reading path.</h2>
           <p>The map starts with the whole system, then lets readers descend only where the detail helps them make sense of the product or implementation.</p>
         </div>
-        <figure class="workflow-figure"><img src="assets/workflow.gif" alt="Animated walkthrough from choosing a reader to opening a standalone codebase system map" width="1120" height="700" loading="lazy"><figcaption>Describe the reader → follow evidence → share one offline HTML.</figcaption></figure>
-        <div class="three-up">
-          <article class="feature"><div class="step">01</div><div><h3>System overview</h3><p>What the repository enables, its major responsibilities, and one clear end-to-end path.</p></div></article>
-          <article class="feature"><div class="step">02</div><div><h3>Module views</h3><p>Meaningful boundaries, relationships, decisions, and outcomes—named in language the reader understands.</p></div></article>
-          <article class="feature"><div class="step">03</div><div><h3>Node evidence</h3><p>Purpose, input, output, tight source references, and real prompt excerpts when the codebase contains them.</p></div></article>
+        <p class="reading-path-note"><strong>This is one map, not three examples.</strong> Select a level to see what the reader learns as they go deeper.</p>
+        <div class="reading-path" data-reading-path>
+          <div class="reading-path-tabs" role="tablist" aria-label="Map reading levels">
+            <button class="reading-step active" type="button" role="tab" id="reading-tab-overview" aria-controls="reading-panel-overview" aria-selected="true" tabindex="0" data-reading-step="overview"><span class="reading-number">01</span><span><strong>System overview</strong><small>What does the whole system do?</small></span></button>
+            <button class="reading-step" type="button" role="tab" id="reading-tab-module" aria-controls="reading-panel-module" aria-selected="false" tabindex="-1" data-reading-step="module"><span class="reading-number">02</span><span><strong>Module view</strong><small>Which part owns each responsibility?</small></span></button>
+            <button class="reading-step" type="button" role="tab" id="reading-tab-node" aria-controls="reading-panel-node" aria-selected="false" tabindex="-1" data-reading-step="node"><span class="reading-number">03</span><span><strong>Node evidence</strong><small>What proves this explanation?</small></span></button>
+          </div>
+          <div class="reading-stage">
+            <section class="reading-panel active" role="tabpanel" id="reading-panel-overview" aria-labelledby="reading-tab-overview" data-reading-panel="overview">
+              <div class="reading-preview-heading"><span>LEVEL 01 · SYSTEM</span><strong>Account &amp; items journey</strong><p>Start with the product story and one complete path through the system.</p></div>
+              <div class="overview-route" aria-label="Account access flows through identity protection and owned items to a user outcome">
+                <div class="route-card blue"><small>ENTRY</small><strong>Account access</strong><span>Sign up, sign in, recover</span></div><i aria-hidden="true">→</i>
+                <div class="route-card peach"><small>DECISION</small><strong>Identity check</strong><span>Protect private actions</span></div><i aria-hidden="true">→</i>
+                <div class="route-card green"><small>CAPABILITY</small><strong>Owned items</strong><span>Create and manage content</span></div><i aria-hidden="true">→</i>
+                <div class="route-card yellow"><small>OUTCOME</small><strong>Visible result</strong><span>Safe success or recovery</span></div>
+              </div>
+              <p class="reading-takeaway"><strong>The reader gets:</strong> the system's purpose, major responsibilities, and primary journey—before implementation detail.</p>
+            </section>
+            <section class="reading-panel" role="tabpanel" id="reading-panel-module" aria-labelledby="reading-tab-module" data-reading-panel="module" hidden>
+              <div class="reading-preview-heading"><span>LEVEL 02 · MODULE</span><strong>Inside account access</strong><p>Open one meaningful boundary without expanding the rest of the repository.</p></div>
+              <div class="module-preview">
+                <div class="module-summary"><small>MODULE RESPONSIBILITY</small><strong>Let people enter or recover their account safely.</strong><div class="module-tags"><span>sign-up</span><span>sign-in</span><span>recovery</span></div></div>
+                <div class="module-route"><div><small>INPUT</small><strong>Credentials</strong></div><i aria-hidden="true">→</i><div class="decision-node"><small>DECISION</small><strong>Identity valid?</strong></div><i aria-hidden="true">→</i><div><small>OUTPUT</small><strong>Session or recovery</strong></div></div>
+              </div>
+              <p class="reading-takeaway"><strong>The reader gets:</strong> module ownership, decisions, interfaces, failures, and outcomes in language suited to their role.</p>
+            </section>
+            <section class="reading-panel" role="tabpanel" id="reading-panel-node" aria-labelledby="reading-tab-node" data-reading-panel="node" hidden>
+              <div class="reading-preview-heading"><span>LEVEL 03 · NODE</span><strong>Why “Identity check” exists</strong><p>Inspect one node only when its implementation or evidence matters.</p></div>
+              <div class="node-preview">
+                <div class="node-purpose"><small>PURPOSE</small><strong>Prevent private actions without a valid user.</strong><p>This node turns a product rule into an explicit system decision.</p></div>
+                <dl class="node-facts"><div><dt>Input</dt><dd>Access token</dd></div><div><dt>Output</dt><dd>Current user or access error</dd></div><div><dt>Source</dt><dd><code>backend/app/api/deps.py:25–46</code></dd></div><div><dt>Prompt</dt><dd>Shown here when real prompt code exists</dd></div></dl>
+              </div>
+              <p class="reading-takeaway"><strong>The reader gets:</strong> purpose, input, output, exact source evidence, and real prompt excerpts where relevant.</p>
+            </section>
+          </div>
         </div>
       </div>
     </section>
@@ -132,15 +162,15 @@
     <section class="section" id="install">
       <div class="wrap">
         <div class="install-panel">
-          <div><div class="eyebrow">Two specialized layers</div><h2>Index first. Explain second.</h2><p>Install the Codebase Memory repository-intelligence provider, then copy this Skill into your local skills directory. The provider handles exhaustive structural indexing; your agent handles reader-shaped synthesis.</p><p><a href="https://github.com/DeusData/codebase-memory-mcp">Install Codebase Memory ↗</a><br><a href="https://github.com/Farmer-Zh/codebase-system-map#quick-start">Read the full guide →</a></p></div>
+          <div><div class="eyebrow">Two specialized layers</div><h2>Index first. Explain second.</h2><p>Install the Codebase Memory repository-intelligence provider, then copy this Skill into your local skills directory. The provider handles exhaustive structural indexing; your agent handles reader-shaped synthesis.</p><p><a href="https://github.com/DeusData/codebase-memory-mcp">Install Codebase Memory ↗</a><br><a href="https://github.com/farmerzh47/codebase-system-map#quick-start">Read the full guide →</a></p></div>
           <div class="code-box" data-code-tabs>
             <div class="code-tabs" role="tablist" aria-label="Install commands"><button class="active" data-tab="windows" role="tab">Windows</button><button data-tab="unix" role="tab">macOS / Linux</button></div>
-            <div class="code-pane active" data-pane="windows"><button class="copy-button" data-copy data-copied="Copied" data-failed="Select text">Copy</button><pre><code>git clone https://github.com/Farmer-Zh/codebase-system-map.git
+            <div class="code-pane active" data-pane="windows"><button class="copy-button" data-copy data-copied="Copied" data-failed="Select text">Copy</button><pre><code>git clone https://github.com/farmerzh47/codebase-system-map.git
 cd codebase-system-map
 $skillPath = Join-Path $env:USERPROFILE ".codex\skills\codebase-system-map"
 New-Item -ItemType Directory -Force $skillPath | Out-Null
 Copy-Item ".\codebase-system-map\*" $skillPath -Recurse -Force</code></pre></div>
-            <div class="code-pane" data-pane="unix"><button class="copy-button" data-copy data-copied="Copied" data-failed="Select text">Copy</button><pre><code>git clone https://github.com/Farmer-Zh/codebase-system-map.git
+            <div class="code-pane" data-pane="unix"><button class="copy-button" data-copy data-copied="Copied" data-failed="Select text">Copy</button><pre><code>git clone https://github.com/farmerzh47/codebase-system-map.git
 cd codebase-system-map
 mkdir -p "$HOME/.codex/skills/codebase-system-map"
 cp -R codebase-system-map/. "$HOME/.codex/skills/codebase-system-map/"</code></pre></div>
@@ -162,7 +192,7 @@ cp -R codebase-system-map/. "$HOME/.codex/skills/codebase-system-map/"</code></p
           <article class="library-card"><span class="license">EPL-2.0</span><h3>Graphviz</h3><p>The DOT layout engine compiled into Viz.js WebAssembly, producing the diagrams’ SVG geometry.</p></article>
           <article class="library-card"><span class="license">MIT</span><h3>Expat</h3><p>An XML parser included transitively in the Viz.js object-code distribution.</p></article>
         </div>
-        <p class="plain-note">Codebase Memory is installed separately and accessed through its Agent Skill or MCP interface. The website is implemented in plain HTML, CSS, and JavaScript. See the <a href="https://github.com/Farmer-Zh/codebase-system-map/blob/main/THIRD_PARTY_NOTICES.md">complete third-party notices and license texts</a>.</p>
+        <p class="plain-note">Codebase Memory is installed separately and accessed through its Agent Skill or MCP interface. The website is implemented in plain HTML, CSS, and JavaScript. See the <a href="https://github.com/farmerzh47/codebase-system-map/blob/main/THIRD_PARTY_NOTICES.md">complete third-party notices and license texts</a>.</p>
       </div>
     </section>
 
@@ -171,13 +201,13 @@ cp -R codebase-system-map/. "$HOME/.codex/skills/codebase-system-map/"</code></p
         <div class="eyebrow">A map is a conversation</div>
         <h2>Make the codebase legible to the people deciding what comes next.</h2>
         <p>Open source, MIT licensed, cross-platform, and designed to leave you with one file you can actually share.</p>
-        <div class="actions"><a class="button primary" href="https://github.com/Farmer-Zh/codebase-system-map">View on GitHub <span aria-hidden="true">↗</span></a><a class="button" href="showcases/openai-agents-python.html">Explore a prompt-aware map</a></div>
+        <div class="actions"><a class="button primary" href="https://github.com/farmerzh47/codebase-system-map">View on GitHub <span aria-hidden="true">↗</span></a><a class="button" href="showcases/openai-agents-python.html">Explore a prompt-aware map</a></div>
       </div>
     </section>
   </main>
 
   <footer class="site-footer">
-    <div class="wrap footer-row"><span>Codebase System Map · MIT · 2026</span><div class="footer-links"><a href="https://github.com/Farmer-Zh/codebase-system-map/blob/main/README.md">Documentation</a><a href="https://github.com/Farmer-Zh/codebase-system-map/blob/main/THIRD_PARTY_NOTICES.md">Third-party notices</a><a href="https://github.com/Farmer-Zh/codebase-system-map/issues">Issues</a></div></div>
+    <div class="wrap footer-row"><span>Codebase System Map · MIT · 2026</span><div class="footer-links"><a href="https://github.com/farmerzh47/codebase-system-map/blob/main/README.md">Documentation</a><a href="https://github.com/farmerzh47/codebase-system-map/blob/main/THIRD_PARTY_NOTICES.md">Third-party notices</a><a href="https://github.com/farmerzh47/codebase-system-map/issues">Issues</a></div></div>
   </footer>
   <script src="assets/site.js"></script>
 </body>

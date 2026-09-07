@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://farmer-zh.github.io/codebase-system-map/sitemap.xml
+Sitemap: https://farmerzh47.github.io/codebase-system-map/sitemap.xml
